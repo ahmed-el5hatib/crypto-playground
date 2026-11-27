@@ -11,10 +11,10 @@
 | 1 | Classical ciphers (Caesar, Vigenère, frequency analysis) | ✅ متاح |
 | 2 | Symmetric encryption (XOR, AES, ECB vs CBC) | ✅ متاح |
 | 3 | Hash functions (SHA-256, avalanche, password hashing) | ✅ متاح |
-| 4 | Public-key (RSA, DH, ECC) | ⏳ قريباً |
-| 5 | Digital signatures (ECDSA, Dilithium) | ⏳ قريباً |
-| 6 | Post-quantum (Kyber, lattices, Shor) | ⏳ قريباً |
-| 7 | Attacks lab (padding oracle, weak keys, nonce reuse) | ⏳ قريباً |
+| 4 | Public-key (RSA, DH, ECC) | ✅ متاح |
+| 5 | Digital signatures (ECDSA, Dilithium) | ✅ متاح |
+| 6 | Post-quantum (Kyber, lattices, Shor) | ✅ متاح |
+| 7 | Attacks lab (padding oracle, weak keys, nonce reuse) | ✅ متاح |
 
 ## التشغيل محلياً (Run locally)
 
