@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تشفير ما بعد الكم — CryptoPlayground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <span class="logo-mark"><i class="ic" data-icon="logo"></i></span>
+    <span>CryptoPlayground<small>OPEN SOURCE · LEARN BY DOING</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#modules">المسارات</a>
+    <span class="nav-score" data-score>0 pts</span>
+  </div>
+</nav>
+
+<header class="lab-hero">
+  <div class="crumbs"><a href="../index.html#modules">المسارات</a> ← مسار ٦</div>
+  <h1>تشفير ما بعد الكم <span class="en">POST-QUANTUM CRYPTOGRAPHY</span></h1>
+  <p>يوم ما كمبيوتر كمي كبير يتبني، RSA وECC يتكسروا في ساعات. العالم كله بيتحول دلوقتي لخوارزميات قايمتها الرياضية مختلفة تماماً: الـ lattices. ده المسار اللي بيمثل المستقبل — وتخصص أبحاثك كمان.</p>
+</header>
+
+<main class="lab-body">
+
+  <!-- ===================== LESSON 1: SHOR'S THREAT ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">01</span> هجوم Shor: يوم الحساب</h2>
+    <p>
+      خوارزمية <b>Shor</b> (1994) على كمبيوتر كمي بتحل مسألتين بسرعة خيالية:
+      <b>تحليل الأعداد لعواملها</b> (يكسر RSA) و<b>اللوغاريتم المنفصل</b> (يكسر DH وECC).
+      وخوارزمية <b>Grover</b> بتسرّع البحث بس — فبتأثر على التشفير المتماثل بشكل أضعف بكتير.
+      اختار أي خوارزمية وشوف مصيرها:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">THREAT METER · مين بيقع ومين بيصمد؟</div>
+      <div class="field" style="max-width:280px">
+        <label>اختار الخوارزمية</label>
+        <select id="threat-alg" style="width:100%">
+          <option value="rsa">RSA-2048 (مفتاح عام)</option>
+          <option value="ecc">ECDSA / ECDH P-256 (منحنيات)</option>
+          <option value="dh">Diffie-Hellman الكلاسيكي</option>
+          <option value="aes128">AES-128 (متماثل)</option>
+          <option value="aes256">AES-256 (متماثل)</option>
+          <option value="sha">SHA-256 (هاش)</option>
+          <option value="kyber">ML-KEM / Kyber (lattices)</option>
+        </select>
+      </div>
+      <div id="threat-out" style="margin-top:16px"></div>
+      <p style="margin-top:14px;font-size:0.82rem;color:var(--text-low)">
+        "Harvest now, decrypt later": المهاجمين بيسجّلوا ترافيك مشفر دلوقتي عشان يفكوه لما الكم يجهز. عشان كده التحول بدأ من دلوقتي.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="pq-1" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ١: مين العدو؟</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">ليه AES-256 يعتبر آمن نسبياً ضد الكم بينما RSA-2048 لأ؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">لأن AES أحدث من RSA</div>
+        <div class="mcq-opt" data-correct>لأن Grover بيقلل أمان المفتاح المتماثل للنص بس (256→128 bit، لسه كتير)، بينما Shor بيكسر البنية الرياضية اللي RSA مبني عليها كاملة</div>
+        <div class="mcq-opt">لأن RSA مفتاحه قصير</div>
+        <div class="mcq-opt">لأن الكمبيوتر الكمي مش بيقدر يشغّل غير Shor</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 2: LATTICES ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">02</span> الـ Lattices: شبكة النقاط الصعبة</h2>
+    <p>
+      الـ lattice هي شبكة نقاط منتظمة في الفراغ، متولّدة من متجهات أساس <span class="inline-code">b1, b2</span>:
+      كل نقطة = عدد صحيح × b1 + عدد صحيح × b2.
+      المسألة الصعبة: مديتك نقطة عشوائية في الفراغ، <b>لاقي أقرب نقطة شبكة ليها (CVP)</b> —
+      سهلة في بُعدين (شوفها بعينك تحت)، كابوسية في 500 بُعد.
+      حرّك النقطة الهدف وشوف أقرب نقطة شبكة:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">LATTICE LAB · أقرب نقطة شبكة (CVP) في بُعدين</div>
+      <div class="field-row">
+        <div class="field"><label>الهدف x: <span class="range-val" id="lat-x-val">2.3</span></label><input type="range" id="lat-x" min="0" max="60" value="23"></div>
+        <div class="field"><label>الهدف y: <span class="range-val" id="lat-y-val">1.7</span></label><input type="range" id="lat-y" min="0" max="60" value="17"></div>
+      </div>
+      <canvas id="lat-canvas" width="520" height="380" style="width:100%;max-width:520px;display:block;margin:10px auto;border-radius:12px;border:1px solid var(--stroke);background:#02060f"></canvas>
+      <p style="margin-top:10px;font-size:0.85rem;color:var(--text-mid)" id="lat-caption"></p>
+      <p style="margin-top:8px;font-size:0.8rem;color:var(--text-low)">
+        ملاحظة للباحثين: الخوارزمية اللي بنستخدمها هنا (تقريب Gauss) بتشتغل كويس في بُعدين بس. في أبعاد عالية، أحسن الخوارزميات المعروفة (BKZ) بتاخد وقت أُسي — ومفيش خوارزمية كم معروفة بتحلها بكفاءة. دي نقطة الأمان كلها.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="pq-2" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٢: أساس الأمان</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">التشفير المبني على lattices (زي Kyber وDilithium) أمانه قائم على إيه؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">صعوبة تحليل الأعداد الكبيرة لعواملها</div>
+        <div class="mcq-opt" data-correct>صعوبة مسائل هندسية في أبعاد عالية زي إيجاد أقصر متجه (SVP) أو أقرب نقطة (CVP)، حتى للكمبيوتر الكمي</div>
+        <div class="mcq-opt">سرية الخوارزمية نفسها</div>
+        <div class="mcq-opt">صعوبة اللوغاريتم المنفصل على المنحنيات</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 3: KYBER / ML-KEM ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">03</span> Kyber (ML-KEM): تبادل مفاتيح عصر الكم</h2>
+    <p>
+      في 2024، NIST اعتمدت Kyber كمعيار رسمي باسم <span class="inline-code">ML-KEM</span> (FIPS 203).
+      هو مش تشفير رسايل مباشر — هو <b>KEM</b> (Key Encapsulation Mechanism): بيخلي طرفين يتفقوا على مفتاح متماثل مشترك
+      (زي DH بس مقاوم للكم)، وبعدين يشتغلوا AES عادي. التدفق في 3 خطوات:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">KEM FLOW · خطوة بخطوة بأرقام LWE لعبة</div>
+      <p style="font-size:0.85rem;color:var(--text-low);margin-bottom:12px">
+        فكرة LWE المبسطة: المعادلة <span class="inline-code">A·s + e ≈ b (mod q)</span> سهلة تحسبها معرفاً s وe (الضجيج الصغير)، صعبة جداً تعكسها من (A, b) بس.
+      </p>
+      <div class="field-row">
+        <div class="field" style="max-width:150px"><label>السر s (بتمثله أليس)</label><input type="text" id="kem-s" class="mono" value="3"></div>
+        <div class="field" style="max-width:150px"><label>الضجيج e</label><input type="text" id="kem-e" class="mono" value="1"></div>
+        <div class="field" style="max-width:150px"><label>رسالة بوب (0 أو 1)</label><input type="text" id="kem-m" class="mono" value="1"></div>
+      </div>
+      <div id="kem-steps" style="font-family:var(--font-mono);font-size:0.82rem;direction:ltr;text-align:left;color:var(--text-mid);line-height:2.1"></div>
+      <div class="output-box" style="margin-top:10px"><span class="lbl">بوب فكّها ووصل لنفس البت؟</span><span id="kem-out" style="color:var(--green)"></span></div>
+      <p style="margin-top:10px;font-size:0.8rem;color:var(--text-low)">
+        النموذج ده مصغّر جداً (q=17 وأرقام صغيرة) لكنه نفس روح Regev/Li اللي Kyber مبني عليها: الضجيج الصغير هو اللي بيخلي العكس صعب، وبيتحمّل في الفك.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="pq-3" data-answer-hash="40806cd69776d7b054f6d99e3565ffb9334813eaa8f96fd9c8dd2722b36b0df9" data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ٣: الاسم الرسمي</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">NIST اعتمدت Kyber كمعيار في 2024 تحت اسم رسمي إيه؟ (بالصيغة: XX-XXX)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="الاسم الرسمي..." data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">مكتوب في أول سطر من الدرس ده: ML-???</span>
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align:center;margin-top:40px">
+    <a class="btn btn-ghost" href="signatures.html">→ السابق: التوقيعات</a>
+    <a class="btn btn-primary" href="attacks.html">التالي: معمل الهجمات ←</a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="f-brand">CryptoPlayground</div>
+  <p>مسار ٦ من ٧ · تشفير ما بعد الكم</p>
+</footer>
+
+<script src="../assets/js/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- threat meter ---------- */
+  const data = {
+    rsa: { broken: true, title: "RSA-2048", verdict: "بيتكسر تماماً بهجوم Shor", color: "var(--red)",
+      detail: "Shor بيحلل n لعواملها في وقت متعدد الحدود. تقديرات: كمبيوتر كمي بـ ~4000 logical qubit مستقر يكسر RSA-2048 في ساعات. لسه مش موجود، بس الترافيك المسجّل النهارده هيتفك يومها." },
+    ecc: { broken: true, title: "ECDSA / ECDH (P-256)", verdict: "بيتكسر بهجوم Shor — وأسرع من RSA", color: "var(--red)",
+      detail: "اللوغاريتم المنفصل على المنحنيات بيتحل بـ Shor بعدد qubits أقل من اللي RSA محتاجه. P-256 يقع قبل RSA-2048." },
+    dh: { broken: true, title: "Diffie-Hellman الكلاسيكي", verdict: "بيتكسر بهجوم Shor", color: "var(--red)",
+      detail: "نفس مسألة اللوغاريتم المنفصل. تبادل المفاتيح لازم ينتقل لـ ML-KEM أو هجين X25519+ML-KEM." },
+    aes128: { broken: false, title: "AES-128", verdict: "صامد جزئياً — Grover بيخليه 64-bit أمان", color: "var(--amber)",
+      detail: "Grover بيقلل البحث من 2¹²⁸ لـ 2⁶⁴ — على الحد. عشان كده التوصية: AES-256." },
+    aes256: { broken: false, title: "AES-256", verdict: "صامد — Grover بيخليه 128-bit أمان", color: "var(--green)",
+      detail: "2¹²⁸ محاولة حتى بمسرّع كمي رقم فلكي. التشفير المتماثل بمفاتيح طويلة ناجي." },
+    sha: { broken: false, title: "SHA-256", verdict: "صامد — Grover بيأثر على preimage بشكل محدود", color: "var(--green)",
+      detail: "أمان الـ collision بيفضل ~128 bit. دوال الهاش الحديثة ناجية بشكل عام." },
+    kyber: { broken: false, title: "ML-KEM (Kyber)", verdict: "مصمم أصلاً يصمد ضد الكم", color: "var(--green)",
+      detail: "مبني على Module-LWE: مفيش خوارزمية كم معروفة بتحل مسائل الـ lattice في الأبعاد دي. معيار NIST FIPS 203." }
+  };
+  const sel = document.getElementById("threat-alg");
+  function updateThreat() {
+    const d = data[sel.value];
+    document.getElementById("threat-out").innerHTML =
+      '<div style="border:1px solid ' + d.color + ';border-radius:14px;padding:18px;background:rgba(2,6,17,0.5)">' +
+      '<div style="font-weight:800;font-size:1.05rem">' + d.title + '</div>' +
+      '<div style="color:' + d.color + ';font-weight:700;margin:6px 0">' + d.verdict + '</div>' +
+      '<div style="color:var(--text-mid);font-size:0.88rem">' + d.detail + '</div></div>';
+  }
+  sel.addEventListener("change", updateThreat);
+  updateThreat();
+
+  /* ---------- lattice lab ---------- */
+  const cv = document.getElementById("lat-canvas");
+  const ctx = cv.getContext("2d");
+  const lx = document.getElementById("lat-x"), ly = document.getElementById("lat-y");
+  const B1 = [1.2, 0.4], B2 = [0.3, 1.1]; // lattice basis
+  const SCALE = 55, OX = 60, OY = 300;
+  function toPx(x, y) { return [OX + x * SCALE, OY - y * SCALE]; }
+  function drawLattice() {
+    const tx = parseInt(lx.value, 10) / 10, ty = parseInt(ly.value, 10) / 10;
+    document.getElementById("lat-x-val").textContent = tx.toFixed(1);
+    document.getElementById("lat-y-val").textContent = ty.toFixed(1);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    // lattice points
+    let best = null, bestD = 1e9;
+    for (let i = -2; i < 8; i++) for (let j = -2; j < 6; j++) {
+      const x = i * B1[0] + j * B2[0], y = i * B1[1] + j * B2[1];
+      const [px, py] = toPx(x, y);
+      if (px < -10 || px > cv.width + 10 || py < -10 || py > cv.height + 10) continue;
+      const d = Math.hypot(x - tx, y - ty);
+      if (d < bestD) { bestD = d; best = [x, y, i, j]; }
+      ctx.fillStyle = "rgba(34,211,238,0.85)";
+      ctx.beginPath(); ctx.arc(px, py, 4, 0, 7); ctx.fill();
+    }
+    // basis vectors
+    for (const [v, c, lbl] of [[B1, "#fbbf24", "b1"], [B2, "#8b5cf6", "b2"]]) {
+      const [x0, y0] = toPx(0, 0), [x1, y1] = toPx(v[0], v[1]);
+      ctx.strokeStyle = c; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.fillStyle = c; ctx.font = "13px JetBrains Mono";
+      ctx.fillText(lbl, x1 + 6, y1 - 6);
+    }
+    // target + nearest
+    const [tpx, tpy] = toPx(tx, ty);
+    const [bpx, bpy] = toPx(best[0], best[1]);
+    ctx.strokeStyle = "#f472b6"; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(tpx, tpy); ctx.lineTo(bpx, bpy); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#f472b6";
+    ctx.beginPath(); ctx.arc(tpx, tpy, 7, 0, 7); ctx.fill();
+    ctx.strokeStyle = "#34d399"; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(bpx, bpy, 9, 0, 7); ctx.stroke();
+    document.getElementById("lat-caption").innerHTML =
+      "الهدف (<span style='color:var(--pink)'>الوردي</span>): (" + tx.toFixed(1) + ", " + ty.toFixed(1) +
+      ") · أقرب نقطة شبكة (<span style='color:var(--green)'>الأخضر</span>): (" + best[0].toFixed(1) + ", " + best[1].toFixed(1) +
+      ") = " + best[2] + "·b1 + " + best[3] + "·b2 · المسافة: " + bestD.toFixed(2);
+  }
+  lx.addEventListener("input", drawLattice);
+  ly.addEventListener("input", drawLattice);
+  drawLattice();
+
+  /* ---------- toy LWE / KEM flow ---------- */
+  const ks = document.getElementById("kem-s"), ke = document.getElementById("kem-e"), km = document.getElementById("kem-m");
+  const Q = 17, A = [5, 9, 4]; // public A (toy)
+  function mod(n, m) { return ((n % m) + m) % m; }
+  function updateKem() {
+    const s = parseInt(ks.value, 10) || 3;
+    const e = parseInt(ke.value, 10) || 0;
+    const m = parseInt(km.value, 10) ? 1 : 0;
+    // Alice keygen: b = A*s + e (component-wise, single e per component rotated)
+    const b = A.map((a, i) => mod(a * s + ((e + i) % 3), Q));
+    // Bob encaps: picks r, u = A*r + e', v = b·r + e'' + m*round(q/2)
+    const r = [2, 1, 3];
+    const u = A.map((a, i) => mod(a * r[i] + (i % 2), Q));
+    const dotBR = mod(b[0] * r[0] + b[1] * r[1] + b[2] * r[2], Q);
+    const v = mod(dotBR + 1 + m * Math.floor(Q / 2), Q);
+    // Alice decaps: v - s·u
+    const dotSU = mod(s * (u[0] + u[1] + u[2]), Q);
+    const dec = mod(v - dotSU, Q);
+    const bit = dec > Q / 4 && dec < 3 * Q / 4 ? 1 : 0;
+    document.getElementById("kem-steps").innerHTML =
+      "① KEYGEN (أليس):  b = A·s + e = <b style='color:var(--cyan)'>[" + b.join(", ") + "]</b>  → تبعت (A, b) علناً<br>" +
+      "② ENCAPS (بوب):   u = A·r + e' = [" + u.join(", ") + "] ، v = b·r + e'' + m·⌊q/2⌋ = " + dotBR + " + 1 + " + m + "·8 = <b style='color:var(--amber)'>" + v + "</b><br>" +
+      "③ DECAPS (أليس):  v − s·u = " + v + " − " + dotSU + " = <b style='color:var(--cyan)'>" + dec + "</b> (mod " + Q + ")";
+    document.getElementById("kem-out").textContent =
+      dec + (bit === 1 ? " قريب من ⌊q/2⌋=8 → البت 1" : " قريب من 0 → البت 0") +
+      (bit === m ? " ✓ نفس رسالة بوب" : " ✗ الضجيج بوّظها — كبّر q أو قلّل e");
+  }
+  [ks, ke, km].forEach(el => el.addEventListener("input", updateKem));
+  updateKem();
+})();
+</script>
+</body>
+</html>
