@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>معمل الهجمات — CryptoPlayground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <span class="logo-mark"><i class="ic" data-icon="logo"></i></span>
+    <span>CryptoPlayground<small>OPEN SOURCE · LEARN BY DOING</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#modules">المسارات</a>
+    <span class="nav-score" data-score>0 pts</span>
+  </div>
+</nav>
+
+<header class="lab-hero">
+  <div class="crumbs"><a href="../index.html#modules">المسارات</a> ← مسار ٧</div>
+  <h1>معمل الهجمات <span class="en">ATTACKS LAB</span></h1>
+  <p>التشفير بيتكسر نادراً من الرياضيات — بيتكسر من التنفيذ الغلط: nonce متكرر، padding بيتكلم، مفاتيح ضعيفة. هنا هتنفّذ الهجوم بإيدك على نماذج لعبة، عشان تعرف تدافع بعدين.</p>
+</header>
+
+<main class="lab-body">
+
+  <!-- ===================== LESSON 1: NONCE REUSE ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">01</span> Nonce Reuse: لما "العشوائي" يتكرر</h2>
+    <p>
+      الـ one-time pad آمن نظرياً 100% — <b>بشرط</b> إن المفتاح يتستخدم مرة واحدة بس.
+      نفس القاعدة بتطبق على stream ciphers وCTR mode: تكرار الـ nonce بيكسر كل حاجة.
+      جرّب: رسالتين اتشفروا بنفس المفتاح، اضغط XOR وشوف إيه اللي بيتسرب:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">KEY-REUSE CRACKER · c1 ⊕ c2 = m1 ⊕ m2</div>
+      <div class="field-row">
+        <div class="field"><label>رسالة 1 (m1)</label><input type="text" id="nr-m1" class="mono" value="attackatdawn" maxlength="20"></div>
+        <div class="field"><label>رسالة 2 (m2)</label><input type="text" id="nr-m2" class="mono" value="retreatatnoon" maxlength="20"></div>
+        <div class="field" style="max-width:120px"><label>المفتاح (نفسه للتنين!)</label><input type="text" id="nr-k" class="mono" value="XMCKL"></div>
+      </div>
+      <button class="btn btn-primary" id="nr-run">شفّر الاتنين بنفس المفتاح</button>
+      <div class="output-box" style="margin-top:14px;direction:ltr;text-align:left;font-family:var(--font-mono)" id="nr-out"></div>
+      <p style="margin-top:12px;font-size:0.85rem;color:var(--text-mid)">
+        شفت؟ المفتاح <b>اختفى تماماً</b> من المعادلة: c1 ⊕ c2 = m1 ⊕ m2. ولو عرفت أي جزء من رسالة (زي إن الرسايل العسكرية بتبدأ بـ "ATTACK")، تقدر تفك التانية حرف بحرف — ده اسمه crib dragging، وده اللي حصل فعلاً مع مشروع Venona ضد رسايل السوفييت.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="at-1" data-answer-hash="f5279a37134e8e01eed8c0cfdf1772763e92c0e4c26c35baa878eae579da0a54" data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ١: المعادلة السحرية</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">لو c1 = m1 ⊕ k و c2 = m2 ⊕ k (نفس الـ k)، يبقى c1 ⊕ c2 يساوي إيه؟ اكتب الناتج بالصيغة: mX xor mY</p>
+      <div class="ex-row">
+        <input type="text" placeholder="..." data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">الـ k بيظهر مرتين في الـ XOR، وأي حاجة XOR نفسها بتساوي صفر.</span>
+      </div>
+    </div>
+
+    <div class="exercise" data-ex-id="at-2" data-answer-hash="d7cd482cb958ef235f5d26e852472ba1ee5309eab18e3c6712181a7bfae80000" data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ٢: فضيحة البلايستيشن</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">في 2010، سوني استخدمت نفس الـ nonce (k) في كل توقيعات ECDSA بتاعت البلايستيشن 3. المهاجمين من توقيعين بس طلّعوا إيه؟ (كلمتين: المفتاح الخاص)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="..." data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">الحاجة اللي مفروض محدش يعرفها غير سوني نفسها... وبكده أي حد يقدر يمضّع برامج على إنها رسمية.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 2: PADDING ORACLE ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">02</span> Padding Oracle: السيرفر اللي بيتكلم كتير</h2>
+    <p>
+      في AES-CBC، آخر بلوك لازم يتملّى padding صحيح (PKCS#7): بايت واحد ينقص؟ قيمته 01. اتنين؟ 02 02... وهكذا.
+      الخطأ القاتل: سيرفر يرد بشكل مختلف لما الـ padding يكون غلط.
+      كل رد بيكشفلك معلومة، وبتكرار ~256 محاولة لكل بايت <b>تفك الرسالة كلها من غير المفتاح</b>. جرّب المحاكاة:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">ORACLE SIMULATOR · فك بايت ببايت</div>
+      <p style="font-size:0.85rem;color:var(--text-low);margin-bottom:12px">
+        الرسالة السرية المشفرة (CBC لعبة): <span class="inline-code">"FLAG-42"</span> — الـ oracle بيقولك padding صح ولا غلط بس. دوس "خطوة" وشوف المهاجم بيجرّب قيم لحد ما الـ oracle يقول "صح":
+      </p>
+      <button class="btn btn-primary" id="po-step">خطوة (محاولة واحدة)</button>
+      <button class="btn btn-ghost" id="po-reset">من الأول</button>
+      <div class="output-box" style="margin-top:14px;direction:ltr;text-align:left;font-family:var(--font-mono);min-height:90px" id="po-out">اضغط "خطوة" عشان تبدأ الهجوم...</div>
+      <div id="po-progress" style="margin-top:10px;font-size:0.85rem;color:var(--amber)"></div>
+    </div>
+
+    <div class="exercise" data-ex-id="at-3" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٣: الحماية</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">إيه الطريقة الصح لمنع هجوم padding oracle؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">نخفي رسايل الخطأ من المستخدم وبس</div>
+        <div class="mcq-opt">نستخدم IV عشوائي</div>
+        <div class="mcq-opt" data-correct>نتحقق من صحة البيانات الأول (MAC / AEAD زي AES-GCM) قبل أي فك تشفير — Encrypt-then-MAC</div>
+        <div class="mcq-opt">نكبّر حجم البلوك</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 3: WEAK RANDOMNESS ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">03</span> عشوائية ضعيفة: لما الـ "random" يبقى متوقع</h2>
+    <p>
+      أقوى خوارزمية في العالم بتقع لو المفتاح اتولّد بعشوائية ضعيفة. في 2008، ثغرة في OpenSSL على Debian خلّت
+      مولّد الأرقام العشوائي يطلّع عدد محدود من المفاتيح الممكنة — المهاجمين جرّبوهم كلهم.
+      جرّب بنفسك: مولّد ضعيف (بذرة صغيرة) بيولّد مفاتيح متكررة قدام عينيك:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">WEAK RNG LAB · 100 مفتاح من مولّد بذرته 8 بت</div>
+      <button class="btn btn-primary" id="rng-run">ولّد 100 مفتاح</button>
+      <canvas id="rng-canvas" width="520" height="220" style="width:100%;max-width:520px;display:block;margin:14px auto 0;border-radius:12px;border:1px solid var(--stroke);background:#02060f"></canvas>
+      <p style="margin-top:10px;font-size:0.85rem;color:var(--text-mid)" id="rng-caption">كل نقطة مفتاح متولّد. اللون الأحمر = مفتاح اتكرر.</p>
+      <p style="margin-top:8px;font-size:0.8rem;color:var(--text-low)">
+        مولّد كويس (CSPRNG زي /dev/urandom أو crypto.getRandomValues) مساحته 2¹²⁸ على الأقل — مفيش نقطة هتتكرر في عمر الكون. القاعدة: متولّدش مفاتيحك من rand() أو الوقت أو الـ PID أبداً.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="at-4" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٤: التشخيص</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">موقع بيولّد مفاتيح الجلسات من <span class="inline-code">random()</span> العادي بتاع لغة البرمجة (مش CSPRNG). الخطر الحقيقي إيه؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">مفيش خطر، random عشوائي كفاية</div>
+        <div class="mcq-opt" data-correct>المهاجم اللي يعرف خوارزمية المولّد ويقدر يخمّن حالته الداخلية (من بذرة ضعيفة زي الوقت) يتنبأ بالمفاتيح الجاية ويختطف الجلسات</div>
+        <div class="mcq-opt">الخطر بس لو الموقع HTTP مش HTTPS</div>
+        <div class="mcq-opt">الخطر بس مع RSA مش مع AES</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== FINALE ===================== -->
+  <section class="lesson reveal" style="text-align:center">
+    <h2 style="justify-content:center"><i class="ic" data-icon="trophy" style="width:28px;height:28px;color:var(--amber)"></i> خلّصت المسارات السبعة</h2>
+    <p style="max-width:600px;margin:0 auto">
+      من Caesar لحد Kyber، ومن الهاش لحد الهجمات — شوفت الصورة كاملة: التشفير علم ورياضيات وهندسة وتنفيذ.
+      نقاطك محفوظة في المتصفح، والتمارين بتفتح تاني في أي وقت.
+      لو حسيت بفضول أعمق، دي أرضية قوية جداً لتخصص أبحاث: لغة ألماني + منح DAAD + رياضيات الـ lattices = ملف ممتاز.
+    </p>
+    <div style="margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-ghost" href="pqc.html">→ السابق: ما بعد الكم</a>
+      <a class="btn btn-primary" href="../index.html#modules">ارجع للخريطة</a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="f-brand">CryptoPlayground</div>
+  <p>مسار ٧ من ٧ · معمل الهجمات</p>
+</footer>
+
+<script src="../assets/js/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- nonce reuse demo ---------- */
+  function xorStrings(a, b) {
+    const out = [];
+    for (let i = 0; i < a.length; i++) out.push(a.charCodeAt(i) ^ b.charCodeAt(i % b.length));
+    return out;
+  }
+  function hexArr(arr) { return arr.map(x => x.toString(16).padStart(2, "0")).join(" "); }
+  function printable(arr) {
+    return arr.map(x => (x >= 32 && x < 127) ? String.fromCharCode(x) : "·").join("");
+  }
+  function runNR() {
+    const m1 = document.getElementById("nr-m1").value.toLowerCase().replace(/[^a-z]/g, "").padEnd(10, "x").slice(0, 12);
+    const m2 = document.getElementById("nr-m2").value.toLowerCase().replace(/[^a-z]/g, "").padEnd(10, "x").slice(0, 12);
+    const k = (document.getElementById("nr-k").value || "KEY");
+    const c1 = xorStrings(m1, k), c2 = xorStrings(m2, k);
+    const leak = c1.map((x, i) => x ^ c2[i]);
+    const direct = xorStrings(m1, m2);
+    const same = JSON.stringify(leak) === JSON.stringify(direct);
+    document.getElementById("nr-out").innerHTML =
+      "m1 = \"" + m1 + "\"\n" +
+      "m2 = \"" + m2 + "\"\n" +
+      "c1 = " + hexArr(c1) + "\n" +
+      "c2 = " + hexArr(c2) + "\n" +
+      "c1 ⊕ c2 = " + hexArr(leak) + "\n" +
+      "m1 ⊕ m2 = " + hexArr(direct) + "   " + (same ? "✓ <b style='color:var(--red)'>متطابقين — المفتاح اتلغى!</b>" : "") + "\n" +
+      "كنص مقروء: \"" + printable(leak) + "\"  ← أجزاء من الرسالتين ظاهرة هنا";
+  }
+  document.getElementById("nr-run").addEventListener("click", runNR);
+  runNR();
+
+  /* ---------- padding oracle simulator ---------- */
+  const secret = "FLAG-42";
+  let poState = null;
+  function poReset() {
+    poState = { decrypted: [], byteIdx: secret.length - 1, guess: 0, pad: 1 };
+    document.getElementById("po-out").innerHTML = "اضغط \"خطوة\" عشان تبدأ الهجوم...";
+    document.getElementById("po-progress").textContent = "";
+  }
+  function poStep() {
+    if (!poState || poState.byteIdx < 0) poReset(), poState.byteIdx = secret.length - 1;
+    if (poState.byteIdx < 0) return;
+    const target = secret.charCodeAt(poState.byteIdx);
+    const lines = [];
+    poState.guess++;
+    // simulate: correct guess found when guess count == (256 - target) simplified: use target-based
+    const found = poState.guess >= ((target * 7 + poState.byteIdx * 13) % 180) + 30;
+    if (!found) {
+      lines.push("بايت " + (poState.byteIdx + 1) + "/" + secret.length + " · محاولة " + poState.guess + " · guess=0x" + (poState.guess % 256).toString(16).padStart(2, "0") + " → <span style='color:var(--red)'>padding غلط</span>");
+    } else {
+      lines.push("بايت " + (poState.byteIdx + 1) + "/" + secret.length + " · محاولة " + poState.guess + " → <span style='color:var(--green)'>padding صح!</span> البايت المفكوك: <b style='color:var(--amber)'>0x" + target.toString(16).padStart(2, "0") + "</b> (\"" + secret[poState.byteIdx] + "\")");
+      poState.decrypted.unshift(secret[poState.byteIdx]);
+      poState.byteIdx--; poState.guess = 0;
+    }
+    const box = document.getElementById("po-out");
+    box.innerHTML = box.innerHTML.split("\n").slice(-6).join("\n") + (box.innerHTML.includes("اضغط") ? "" : "\n") + lines.join("\n");
+    if (box.innerHTML.includes("اضغط")) box.innerHTML = lines.join("\n");
+    const done = poState.byteIdx < 0;
+    document.getElementById("po-progress").textContent = done
+      ? "انتهى الهجوم! الرسالة المفكوكة: \"" + poState.decrypted.join("") + "\" — من غير المفتاح خالص."
+      : "المفكوك لحد دلوقتي: " + poState.decrypted.join("");
+  }
+  document.getElementById("po-step").addEventListener("click", poStep);
+  document.getElementById("po-reset").addEventListener("click", poReset);
+
+  /* ---------- weak RNG lab ---------- */
+  const rcv = document.getElementById("rng-canvas");
+  const rctx = rcv.getContext("2d");
+  function runRNG() {
+    rctx.clearRect(0, 0, rcv.width, rcv.height);
+    const seen = {};
+    let dupes = 0;
+    // weak generator: seed = counter, key = LCG(seed) with tiny modulus
+    for (let i = 0; i < 100; i++) {
+      let s = i % 256; // 8-bit seed space
+      let x = s;
+      x = (x * 1103515245 + 12345) & 0x7fffffff;
+      const key = x % 997;
+      const px = 20 + (key % 50) * 9.6, py = 20 + Math.floor(key / 50) * 10;
+      const dupe = seen[key];
+      seen[key] = true;
+      if (dupe) dupes++;
+      rctx.fillStyle = dupe ? "#f87171" : "rgba(34,211,238,0.7)";
+      rctx.beginPath(); rctx.arc(px, py, dupe ? 4 : 3, 0, 7); rctx.fill();
+    }
+    document.getElementById("rng-caption").innerHTML =
+      "من 100 مفتاح، <b style='color:var(--red)'>" + dupes + " مفتاح اتكرر</b> — مساحة البحث الحقيقية 256 بذرة بس، المهاجم يجرّبهم كلهم في أقل من ثانية.";
+  }
+  document.getElementById("rng-run").addEventListener("click", runRNG);
+})();
+</script>
+</body>
+</html>
