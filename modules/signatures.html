@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التوقيعات الرقمية — CryptoPlayground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <span class="logo-mark"><i class="ic" data-icon="logo"></i></span>
+    <span>CryptoPlayground<small>OPEN SOURCE · LEARN BY DOING</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#modules">المسارات</a>
+    <span class="nav-score" data-score>0 pts</span>
+  </div>
+</nav>
+
+<header class="lab-hero">
+  <div class="crumbs"><a href="../index.html#modules">المسارات</a> ← مسار ٥</div>
+  <h1>التوقيعات الرقمية <span class="en">DIGITAL SIGNATURES</span></h1>
+  <p>إزاي تثبت إن رسالة منك فعلاً، وإن محدش غيّر فيها حرف؟ التوقيع الرقمي بيديك authenticity وintegrity وعدم إنكار — وهو أساس كل حاجة من تحديثات البرامج لحد الـ blockchain.</p>
+</header>
+
+<main class="lab-body">
+
+  <!-- ===================== LESSON 1: WHAT IS A SIGNATURE ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">01</span> الفكرة: التشفير بالمفتاح الخاص</h2>
+    <p>
+      في التشفير بالمفتاح العام: الكل يشفّر بالمفتاح العام وصاحب المفتاح الخاص بيفك.
+      التوقيع بيقلب الاتجاه: <b>إنت بتوقّع بالمفتاح الخاص، والكل يتحقق بالمفتاح العام</b>.
+      لو التحقق نجح، يبقى مفيش غير صاحب المفتاح الخاص اللي كان يقدر يعمل التوقيع ده.
+      وعشان المساحة والسرعة، بنوقّع على <b>هاش الرسالة</b> مش الرسالة نفسها.
+      جرّب الدورة كاملة بأرقام RSA صغيرة من المسار اللي فات (p=3, q=11):
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">SIGN & VERIFY · دورة توقيع كاملة</div>
+      <p style="font-size:0.85rem;color:var(--text-low);margin-bottom:14px">المفاتيح: n=33 · e=7 (عام) · d=3 (خاص). التوقيع s = mᵈ mod n · التحقق: sᵉ mod n ≟ m</p>
+      <div class="field" style="max-width:220px">
+        <label>الرسالة m (رقم من 0 لـ 32)</label>
+        <input type="text" id="sig-m" class="mono" value="9">
+      </div>
+      <div class="field-row" style="margin-top:8px">
+        <div class="output-box" style="flex:1"><span class="lbl">SIGNATURE s = m³ mod 33 (بالمفتاح الخاص)</span><span id="sig-s" style="color:var(--amber)"></span></div>
+        <div class="output-box" style="flex:1"><span class="lbl">VERIFY s⁷ mod 33 (بالمفتاح العام)</span><span id="sig-v" style="color:var(--green)"></span></div>
+      </div>
+      <div style="margin-top:16px">
+        <label style="font-size:0.85rem;color:var(--text-mid)">جرّب تتلاعب: غيّر التوقيع قبل التحقق (هجوم التزوير)</label>
+        <div class="field-row" style="margin-top:8px">
+          <div class="field"><input type="text" id="sig-forge" class="mono" placeholder="عدّل التوقيع هنا..."></div>
+          <div class="field" style="flex:2"><div class="output-box" id="sig-forge-out" style="min-height:auto">التحقق من توقيعك المعدّل: —</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise" data-ex-id="sg-1" data-answer-hash="4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce" data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ١: وقّع بنفسك</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">بنفس المفاتيح (n=33, d=3): وقّع الرسالة <span class="inline-code">m=9</span>. إيه قيمة التوقيع s؟</p>
+      <div class="ex-row">
+        <input type="text" placeholder="s = ?" data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">s = 9³ mod 33 = 729 mod 33. اكتب 9 في المعمل فوق وهتلاقي التوقيع جاهز.</span>
+      </div>
+    </div>
+
+    <div class="exercise" data-ex-id="sg-2" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٢: مفهوم أساسي</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">ليه بنوقّع على هاش الرسالة مش على الرسالة نفسها؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">عشان التوقيع يبقى أصغر في الحجم بس</div>
+        <div class="mcq-opt" data-correct>عشان السرعة والأمان: الهاش ثابت الطول وسريع، وأي تعديل في الرسالة يغيّر الهاش فيفشل التحقق</div>
+        <div class="mcq-opt">عشان الرسالة تفضل سرية ومحدش يقراها</div>
+        <div class="mcq-opt">مفيش سبب حقيقي، عادة قديمة</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 2: ECDSA ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">02</span> ECDSA: توقيع المنحنيات الإهليجية</h2>
+    <p>
+      المعيار المستخدم في Bitcoin وTLS وكل الأنظمة الحديثة. التوقيع زوج <span class="inline-code">(r, s)</span>
+      بيتولد من المفتاح الخاص وهاش الرسالة و<b>رقم عشوائي k اسمه nonce لازم يتستخدم مرة واحدة بس</b>.
+      تحت محاكاة مبسطة بتوريك التدفق، وأخطر غلطة في تاريخ التوقيعات (هنتعمق فيها في معمل الهجمات):
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">ECDSA FLOW · التدفق خطوة بخطوة (محاكاة تعليمية)</div>
+      <div class="field-row">
+        <div class="field"><label>الرسالة</label><input type="text" id="ecdsa-msg" value="ادفع 100 جنيه لأحمد"></div>
+        <div class="field" style="max-width:170px"><label>nonce k</label><input type="text" id="ecdsa-k" class="mono" value="7"></div>
+      </div>
+      <div id="ecdsa-steps" style="font-family:var(--font-mono);font-size:0.82rem;direction:ltr;text-align:left;color:var(--text-mid);line-height:2.1"></div>
+      <div class="output-box" style="margin-top:10px"><span class="lbl">SIGNATURE (r, s)</span><span id="ecdsa-sig" style="color:var(--amber)"></span></div>
+      <p style="margin-top:12px;font-size:0.85rem;color:var(--text-mid)" id="ecdsa-warn"></p>
+    </div>
+
+    <div class="exercise" data-ex-id="sg-3" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٣: الدرس المستفاد من PS3</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">سوني استخدمت نفس الـ nonce k في كل توقيعات PlayStation 3. إيه نتيجة الغلطة دي؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">التوقيعات بقت أبطأ بس</div>
+        <div class="mcq-opt" data-correct>المهاجمين استخرجوا المفتاح الخاص نفسه من توقيعين بنفس الـ k</div>
+        <div class="mcq-opt">التوقيعات بقت أطول من اللازم</div>
+        <div class="mcq-opt">مفيش مشكلة طالما المفتاح الخاص قوي</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 3: DILITHIUM ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">03</span> Dilithium: توقيع عصر الكم</h2>
+    <p>
+      ECDSA هيتكسر بكمبيوتر كمي كبير (هجوم Shor). عشان كده NIST اعتمدت
+      <span class="inline-code">ML-DSA</span> (المعروف بـ Dilithium) كمعيار توقيع مقاوم للكم —
+      أمانه قايم على صعوبة مسائل الـ <b>lattices</b> مش على تحليل الأعداد.
+      دي تفاصيل مسار PQC الجاي — وهناك هتلاقي Kyber صاحبه في الاستقبال.
+    </p>
+
+    <div class="exercise" data-ex-id="sg-4" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٤: المستقبل</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">إيه السبب الرئيسي لاختراع توقيعات زي Dilithium؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">عشان التوقيعات تبقى أقصر</div>
+        <div class="mcq-opt">عشان التوقيع يبقى أسهل في البرمجة</div>
+        <div class="mcq-opt" data-correct>عشان هجوم Shor على الكمبيوتر الكمي بيكسر RSA وECDSA، فمحتاجين مسائل رياضية يصعُب على الكم حلها</div>
+        <div class="mcq-opt">عشان NIST حبت تغيّر المعايير كل شوية</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <div style="text-align:center;margin-top:40px">
+    <a class="btn btn-ghost" href="publickey.html">→ السابق: المفتاح العام</a>
+    <a class="btn btn-primary" href="pqc.html">التالي: تشفير ما بعد الكم ←</a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="f-brand">CryptoPlayground</div>
+  <p>مسار ٥ من ٧ · التوقيعات الرقمية</p>
+</footer>
+
+<script src="../assets/js/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  function modpow(base, exp, mod) {
+    base = ((base % mod) + mod) % mod;
+    let r = 1;
+    while (exp > 0) {
+      if (exp & 1) r = (r * base) % mod;
+      base = (base * base) % mod;
+      exp >>= 1;
+    }
+    return r;
+  }
+
+  /* ---------- sign & verify toy ---------- */
+  const mIn = document.getElementById("sig-m");
+  const forgeIn = document.getElementById("sig-forge");
+  const N = 33, E = 7, D = 3;
+  function updateSig() {
+    const m = parseInt(mIn.value, 10);
+    if (!(m >= 0 && m < N)) {
+      document.getElementById("sig-s").textContent = "—";
+      document.getElementById("sig-v").textContent = "خارج النطاق";
+      return;
+    }
+    const s = modpow(m, D, N);
+    const v = modpow(s, E, N);
+    document.getElementById("sig-s").textContent = "s = " + m + "³ mod 33 = " + s;
+    document.getElementById("sig-v").textContent = s + "⁷ mod 33 = " + v + (v === m ? " ✓ التوقيع صحيح" : " ✗");
+    updateForge(m);
+  }
+  function updateForge(m) {
+    const f = parseInt(forgeIn.value, 10);
+    const out = document.getElementById("sig-forge-out");
+    if (isNaN(f)) { out.textContent = "التحقق من توقيعك المعدّل: —"; return; }
+    const v = modpow(f, E, N);
+    const match = v === (m ?? parseInt(mIn.value, 10));
+    out.innerHTML = "التحقق: " + f + "⁷ mod 33 = " + v + (match
+      ? " <b style='color:var(--green)'>✓ طابق الرسالة — تقدر تزوّر في النموذج الصغير ده لأن n=33!</b>"
+      : " <b style='color:var(--red)'>✗ فشل التحقق — التزوير انكشف</b>");
+  }
+  mIn.addEventListener("input", updateSig);
+  forgeIn.addEventListener("input", () => updateForge(parseInt(mIn.value, 10)));
+  updateSig();
+
+  /* ---------- ECDSA flow simulation ---------- */
+  const msgIn = document.getElementById("ecdsa-msg");
+  const kIn = document.getElementById("ecdsa-k");
+  const N_ORD = 97; // toy group order
+  const PRIV = 23;  // toy private key
+  const GENX = 17;  // toy generator x-coordinate stand-in
+  async function updateEcdsa() {
+    const msgBytes = new TextEncoder().encode(msgIn.value);
+    const hashBuf = await crypto.subtle.digest("SHA-256", msgBytes);
+    const z = new DataView(hashBuf).getUint32(0) % N_ORD;
+    let k = parseInt(kIn.value, 10) || 7;
+    k = ((k % N_ORD) + N_ORD) % N_ORD || 7;
+    const r = (GENX * k) % N_ORD;
+    // s = k^-1 (z + r*priv) mod n
+    let kinv = 1;
+    for (let i = 1; i < N_ORD; i++) if ((k * i) % N_ORD === 1) { kinv = i; break; }
+    const s = (kinv * (z + r * PRIV)) % N_ORD;
+    document.getElementById("ecdsa-steps").innerHTML =
+      "z  = SHA256(msg) mod " + N_ORD + " = <b style='color:var(--cyan)'>" + z + "</b><br>" +
+      "r  = (k·G).x mod n = (" + GENX + "·" + k + ") mod " + N_ORD + " = <b style='color:var(--cyan)'>" + r + "</b><br>" +
+      "k⁻¹ mod n = " + kinv + "<br>" +
+      "s  = k⁻¹·(z + r·d) mod n = " + kinv + "·(" + z + " + " + r + "·" + PRIV + ") mod " + N_ORD + " = <b style='color:var(--cyan)'>" + s + "</b>";
+    document.getElementById("ecdsa-sig").textContent = "(" + r + ", " + s + ")";
+    document.getElementById("ecdsa-warn").innerHTML =
+      "غيّر الرسالة وشوف (r, s) بيتغيروا كلياً. <b>القاعدة الذهبية:</b> لو استخدمت نفس k مع رسالتين، " +
+      "أي حد يقدر يحسب المفتاح الخاص d من معادلتين — زي ما حصل مع PS3. جرّب k=7 مع رسالتين واكتشف بنفسك في معمل الهجمات.";
+  }
+  msgIn.addEventListener("input", updateEcdsa);
+  kIn.addEventListener("input", updateEcdsa);
+  updateEcdsa();
+})();
+</script>
+</body>
+</html>
