@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التشفير الكلاسيكي — CryptoPlayground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <span class="logo-mark"><i class="ic" data-icon="logo"></i></span>
+    <span>CryptoPlayground<small>OPEN SOURCE · LEARN BY DOING</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#modules">المسارات</a>
+    <span class="nav-score" data-score>0 pts</span>
+  </div>
+</nav>
+
+<header class="lab-hero">
+  <div class="crumbs"><a href="../index.html#modules">المسارات</a> ← مسار ١</div>
+  <h1>التشفير الكلاسيكي <span class="en">CLASSICAL CIPHERS</span></h1>
+  <p>قبل ما يكون فيه كمبيوتر أصلاً، كان فيه تشفير. هنا هتشغّل أقدم الخوارزميات بإيدك، وبعدين هتكسرها — لأن فهم إزاي بتتكسر هو أول خطوة تفهم ليه التشفير الحديث معمول كده.</p>
+</header>
+
+<main class="lab-body">
+
+  <!-- ===================== LESSON 1: CAESAR ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">01</span> شيفرة قيصر (Caesar Cipher)</h2>
+    <p>
+      الفكرة أبسط ما تتخيل: كل حرف بيتبدل بالحرف اللي بعده بعدد ثابت من الخطوات اسمه <b>المفتاح (key)</b>.
+      لو المفتاح 3، الـ <span class="inline-code">A</span> تبقى <span class="inline-code">D</span> والـ <span class="inline-code">B</span> تبقى <span class="inline-code">E</span>.
+      يوليوس قيصر استخدمها فعلاً في رسائله العسكرية من 2000 سنة. حرّك العجلة تحت وشوف بنفسك:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">CAESAR WHEEL · حرّك السلايدر وشوف العجلة بتلف</div>
+      <div class="wheel-wrap">
+        <svg id="caesar-wheel" width="320" height="320" viewBox="0 0 320 320" aria-label="Caesar wheel"></svg>
+        <div style="flex:1;min-width:260px">
+          <div class="field">
+            <label>المفتاح (shift): <span class="range-val" id="shift-val">3</span></label>
+            <input type="range" id="shift" min="0" max="25" value="3">
+          </div>
+          <div class="field">
+            <label>النص الأصلي (plaintext)</label>
+            <input type="text" id="caesar-plain" class="mono" value="HELLO WORLD" maxlength="40">
+          </div>
+          <div class="output-box"><span class="lbl">CIPHERTEXT</span><span id="caesar-out"></span></div>
+          <p style="margin-top:12px;font-size:0.82rem;color:var(--text-low)">
+            فك التشفير هو نفس العملية بالعكس: shift بقيمة <span class="inline-code">26 - key</span>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise" data-ex-id="cl-1" data-answer-hash="b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9" data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ١: فك التشفير</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">النص ده متشفر بشيفرة قيصر بمفتاح 3: <span class="inline-code">KHOOR ZRUOG</span> — إيه النص الأصلي؟ (اكتبه بالإنجليزي small)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="النص الأصلي هنا..." data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">كل حرف ارجع بيه 3 خطوات ورا: K → H ،O → L ،R → O ... جرّب في العجلة فوق بمفتاح 23.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 2: VIGENERE ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">02</span> شيفرة فيجنير (Vigenère Cipher)</h2>
+    <p>
+      قيصر مشكلته إن المفتاح رقم واحد بس: 25 احتمال، أي حد يجرّبهم كلهم في دقيقة.
+      فيجنير حلها بفكرة أذكى: المفتاح <b>كلمة</b>، وكل حرف فيها بيحدد shift مختلف لكل حرف في النص.
+      يعني نفس الحرف ممكن يتشفر بحروف مختلفة حسب مكانه — وده خلاها "غير قابلة للكسر" لمدة 300 سنة.
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">VIGENERE MACHINE · جرّب بمفتاح من اختيارك</div>
+      <div class="field-row">
+        <div class="field">
+          <label>النص الأصلي</label>
+          <input type="text" id="vig-plain" class="mono" value="ATTACKATDAWN" maxlength="30">
+        </div>
+        <div class="field" style="max-width:200px">
+          <label>المفتاح (كلمة)</label>
+          <input type="text" id="vig-key" class="mono" value="KEY" maxlength="12">
+        </div>
+      </div>
+      <div id="vig-table" style="margin:10px 0 16px"></div>
+      <div class="output-box"><span class="lbl">CIPHERTEXT</span><span id="vig-out"></span></div>
+      <p style="margin-top:12px;font-size:0.82rem;color:var(--text-low)">
+        بص على الجدول فوق: كل حرف من المفتاح (قيمته الرقمية) بيتحط على حرف من النص، والمجموع mod 26 هو الحرف المشفر.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="cl-2" data-answer-hash="2503a8d58acc095633918ce909e24309255972539d2d93319c13c29f3024d960" data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ٢: كسر فيجنير</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">فك تشفير <span class="inline-code">KXRKGIKXBKAL</span> بالمفتاح <span class="inline-code">KEY</span>. إيه النص الأصلي؟ (كلمة واحدة small)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="النص الأصلي هنا..." data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">فك التشفير عكس التشفير: اطرح قيمة حرف المفتاح من حرف الـ ciphertext (mod 26). استخدم الآلة فوق — لو كتبت الـ ciphertext والمفتاح هتقدر تقرأ العكس من الجدول.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 3: FREQUENCY ANALYSIS ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">03</span> تحليل التردد (Frequency Analysis)</h2>
+    <p>
+      في اللغة الإنجليزية، حرف <span class="inline-code">E</span> هو الأكثر ظهوراً (~12.7%)، وبعده <span class="inline-code">T</span> و<span class="inline-code">A</span>.
+      أي تشفير <b>استبدالي</b> (كل حرف بيتبدل بحرف ثابت) بيحافظ على الترددات دي — يعني أكثر حرف في الـ ciphertext غالباً هو E متنكرة!
+      دي الطريقة اللي اتكسرت بيها كل الشيفرات الكلاسيكية. الصق أي نص تحت وشوف بصمته:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">FREQUENCY ANALYZER · محلل الترددات</div>
+      <div class="field">
+        <label>النص (ciphertext أو أي نص إنجليزي)</label>
+        <textarea id="freq-input" class="mono" rows="4">WKH HDJOH KDV ODQGHG. WKH ELUGV DUH ZDWFKLQJ. PHHW DW GDZQ XQGHU WKH ROG RDN WUHH.</textarea>
+      </div>
+      <div class="freq-bars" id="freq-bars"></div>
+      <p style="margin-top:14px;font-size:0.85rem;color:var(--text-mid)" id="freq-verdict"></p>
+    </div>
+
+    <div class="exercise" data-ex-id="cl-3" data-answer-hash="3f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046dea" data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٣: عين المحلل</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">إيه أكثر حرف ظهوراً في اللغة الإنجليزية عموماً؟ (حرف واحد)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="حرف واحد..." maxlength="2" data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+
+    <div class="exercise" data-ex-id="cl-4" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٤: النص اللي فوق</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">النص اللي في المحلل فوق أكثر حرف فيه هو <span class="inline-code">H</span> (شوف العمود الوردي). لو عرفنا إنه متشفر بقيصر، يبقى المفتاح كام؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">1 — لأن H قريب من E</div>
+        <div class="mcq-opt" data-correct>3 — لأن H هي E مزياحة 3 خطوات</div>
+        <div class="mcq-opt">23 — لأن دي بقا عدد حروف النص</div>
+        <div class="mcq-opt">مستحيل نعرف من غير ما نجرّب كل المفاتيح</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <div style="text-align:center;margin-top:40px">
+    <a class="btn btn-primary" href="symmetric.html">المسار التالي: التشفير المتماثل ←</a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="f-brand">CryptoPlayground</div>
+  <p>مسار ١ من ٧ · التشفير الكلاسيكي</p>
+</footer>
+
+<script src="../assets/js/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  const AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  /* ---------- Caesar wheel (SVG) ---------- */
+  const svg = document.getElementById("caesar-wheel");
+  const NS = "http://www.w3.org/2000/svg";
+  function ring(radius, letters, cls, rotDeg) {
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", cls);
+    for (let i = 0; i < 26; i++) {
+      const a = (i / 26) * Math.PI * 2 - Math.PI / 2;
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("x", 160 + Math.cos(a) * radius);
+      t.setAttribute("y", 160 + Math.sin(a) * radius + 5);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("fill", cls === "outer" ? "#aab4cc" : "#22d3ee");
+      t.setAttribute("font-size", cls === "outer" ? "13" : "15");
+      t.setAttribute("font-family", "JetBrains Mono, monospace");
+      t.setAttribute("font-weight", cls === "outer" ? "400" : "700");
+      t.textContent = letters[i];
+      g.appendChild(t);
+    }
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", 160); c.setAttribute("cy", 160); c.setAttribute("r", radius + 18);
+    c.setAttribute("fill", "none");
+    c.setAttribute("stroke", cls === "outer" ? "rgba(148,163,184,0.25)" : "rgba(34,211,238,0.4)");
+    c.setAttribute("stroke-width", "1");
+    svg.appendChild(c);
+    svg.appendChild(g);
+    return g;
+  }
+  const outerG = ring(128, AZ, "outer");
+  const innerG = ring(88, AZ, "inner");
+  // center lock (inline SVG paths — no font dependency)
+  const lockG = document.createElementNS(NS, "g");
+  lockG.setAttribute("transform", "translate(136,136) scale(2)");
+  lockG.setAttribute("fill", "none");
+  lockG.setAttribute("stroke", "#5eead4");
+  lockG.setAttribute("stroke-width", "1.6");
+  lockG.setAttribute("stroke-linecap", "round");
+  lockG.setAttribute("stroke-linejoin", "round");
+  [["rect", { x: 4, y: 11, width: 16, height: 10, rx: 2.5 }],
+   ["path", { d: "M8 11V7a4 4 0 0 1 8 0v4" }]
+  ].forEach(([tag, attrs]) => {
+    const el = document.createElementNS(NS, tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    lockG.appendChild(el);
+  });
+  const lockDot = document.createElementNS(NS, "circle");
+  lockDot.setAttribute("cx", 12); lockDot.setAttribute("cy", 16); lockDot.setAttribute("r", 1.6);
+  lockDot.setAttribute("fill", "#5eead4"); lockDot.setAttribute("stroke", "none");
+  lockG.appendChild(lockDot);
+  svg.appendChild(lockG);
+
+  const shiftInput = document.getElementById("shift");
+  const shiftVal = document.getElementById("shift-val");
+  const plainInput = document.getElementById("caesar-plain");
+  const outEl = document.getElementById("caesar-out");
+
+  function caesar(text, k) {
+    return text.toUpperCase().split("").map(ch => {
+      const i = AZ.indexOf(ch);
+      return i === -1 ? ch : AZ[(i + k) % 26];
+    }).join("");
+  }
+  function updateCaesar() {
+    const k = parseInt(shiftInput.value, 10);
+    shiftVal.textContent = k;
+    innerG.setAttribute("transform", `rotate(${k * (360 / 26)} 160 160)`);
+    innerG.style.transition = "transform 0.45s cubic-bezier(0.3,1.2,0.4,1)";
+    outEl.textContent = caesar(plainInput.value, k);
+  }
+  shiftInput.addEventListener("input", updateCaesar);
+  plainInput.addEventListener("input", updateCaesar);
+  updateCaesar();
+
+  /* ---------- Vigenère ---------- */
+  const vPlain = document.getElementById("vig-plain");
+  const vKey = document.getElementById("vig-key");
+  const vOut = document.getElementById("vig-out");
+  const vTable = document.getElementById("vig-table");
+
+  function updateVig() {
+    const p = vPlain.value.toUpperCase().replace(/[^A-Z]/g, "");
+    let k = vKey.value.toUpperCase().replace(/[^A-Z]/g, "");
+    if (!k) k = "A";
+    let out = "";
+    const rows = [[], [], []];
+    for (let i = 0; i < p.length; i++) {
+      const pv = AZ.indexOf(p[i]);
+      const kv = AZ.indexOf(k[i % k.length]);
+      const cv = (pv + kv) % 26;
+      out += AZ[cv];
+      rows[0].push(p[i] + "<small>" + pv + "</small>");
+      rows[1].push(k[i % k.length] + "<small>+" + kv + "</small>");
+      rows[2].push(AZ[cv] + "<small>=" + cv + "</small>");
+    }
+    vOut.textContent = out || "—";
+    const labels = ["PLAIN", "KEY", "CIPHER"];
+    const colors = ["#aab4cc", "#fbbf24", "#22d3ee"];
+    vTable.innerHTML = rows.map((r, ri) =>
+      '<div style="display:flex;gap:4px;direction:ltr;flex-wrap:wrap;margin-bottom:4px;align-items:center">' +
+      '<span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-low);width:52px">' + labels[ri] + '</span>' +
+      r.map(c => '<span style="font-family:var(--font-mono);font-size:0.95rem;font-weight:700;color:' + colors[ri] +
+        ';border:1px solid var(--stroke);border-radius:7px;padding:3px 7px;text-align:center;min-width:34px">' + c +
+        '</span>').join("") + "</div>"
+    ).join("");
+    vTable.querySelectorAll("small").forEach(s => {
+      s.style.cssText = "display:block;font-size:0.55rem;color:var(--text-low);font-weight:400";
+    });
+  }
+  vPlain.addEventListener("input", updateVig);
+  vKey.addEventListener("input", updateVig);
+  updateVig();
+
+  /* ---------- Frequency analyzer ---------- */
+  const fInput = document.getElementById("freq-input");
+  const fBars = document.getElementById("freq-bars");
+  const fVerdict = document.getElementById("freq-verdict");
+
+  function updateFreq() {
+    const text = fInput.value.toUpperCase();
+    const counts = new Array(26).fill(0);
+    let total = 0;
+    for (const ch of text) {
+      const i = AZ.indexOf(ch);
+      if (i !== -1) { counts[i]++; total++; }
+    }
+    const max = Math.max(...counts, 1);
+    const maxIdx = counts.indexOf(max);
+    fBars.innerHTML = counts.map((c, i) => {
+      const h = Math.round((c / max) * 100);
+      return '<div class="freq-bar' + (i === maxIdx && c > 0 ? " max" : "") + '">' +
+        '<div class="bar" style="height:' + Math.max(h, 2) + '%" title="' + AZ[i] + ": " + c + '"></div>' +
+        '<div class="ch">' + AZ[i] + "</div></div>";
+    }).join("");
+    if (total > 0) {
+      fVerdict.innerHTML = "أكثر حرف ظهوراً: <b style='color:var(--pink)'>" + AZ[maxIdx] + "</b> (" + max + " مرة، " +
+        (max / total * 100).toFixed(1) + "%). لو ده ciphertext استبدالي، غالباً " + AZ[maxIdx] + " = E.";
+    } else {
+      fVerdict.textContent = "";
+    }
+  }
+  fInput.addEventListener("input", updateFreq);
+  updateFreq();
+})();
+</script>
+</body>
+</html>
