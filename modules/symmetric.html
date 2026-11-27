@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التشفير المتماثل — CryptoPlayground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <span class="logo-mark"><i class="ic" data-icon="logo"></i></span>
+    <span>CryptoPlayground<small>OPEN SOURCE · LEARN BY DOING</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#modules">المسارات</a>
+    <span class="nav-score" data-score>0 pts</span>
+  </div>
+</nav>
+
+<header class="lab-hero">
+  <div class="crumbs"><a href="../index.html#modules">المسارات</a> ← مسار ٢</div>
+  <h1>التشفير المتماثل <span class="en">SYMMETRIC ENCRYPTION · AES</span></h1>
+  <p>مفتاح واحد بيشفّر وبيفك: دي أسرع طريقة تشفير على الكوكب، واللي بتحمي بيها النت كله (AES). هنا هتنزل لمستوى الـ bits وتشوف إزاي حاجة بسيطة زي XOR بتبني أقوى الأنظمة.</p>
+</header>
+
+<main class="lab-body">
+
+  <!-- ===================== LESSON 1: XOR ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">01</span> عملية XOR: قلب التشفير النابض</h2>
+    <p>
+      <span class="inline-code">XOR</span> عملية بسيطة جداً: <b>لو البتين مختلفين الناتج 1، لو زي بعض الناتج 0</b>.
+      سحرها إنها عملية عكس نفسها: <span class="inline-code">(A XOR K) XOR K = A</span> — يعني نفس المفتاح بيشفّر وبيفك.
+      اكتب أي حرف وأي مفتاح وشوف الـ bits بتتقلب واحدة واحدة:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">XOR VISUALIZER · مستوى البتات</div>
+      <div class="field-row">
+        <div class="field" style="max-width:160px">
+          <label>الحرف (plaintext)</label>
+          <input type="text" id="xor-char" class="mono" value="A" maxlength="1">
+        </div>
+        <div class="field" style="max-width:160px">
+          <label>المفتاح (key)</label>
+          <input type="text" id="xor-key" class="mono" value="K" maxlength="1">
+        </div>
+      </div>
+      <div style="direction:ltr">
+        <div class="bit-label">PLAINTEXT BITS</div>
+        <div class="bit-row" id="xor-row-p"></div>
+        <div class="bit-label" style="color:var(--amber)">KEY BITS</div>
+        <div class="bit-row" id="xor-row-k"></div>
+        <div class="bit-label" style="color:var(--cyan)">CIPHERTEXT = P XOR K</div>
+        <div class="bit-row" id="xor-row-c"></div>
+      </div>
+      <p style="margin-top:14px;font-size:0.9rem;color:var(--text-mid)" id="xor-summary"></p>
+    </div>
+
+    <div class="exercise" data-ex-id="sy-1" data-answer-hash="1b16b1df538ba12dc3f97edbb85caa7050d46c148134290feba80f8236c83db9" data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ١: احسبها بنفسك</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">شفّر الحرف <span class="inline-code">A</span> (binary: <span class="inline-code">01000001</span>) بمفتاح byte قيمته <span class="inline-code">00001111</span> باستخدام XOR. الناتج حرف إيه؟ (اكتب الحرف capital)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="الحرف الناتج..." maxlength="1" data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">اعمل XOR بت ببت: 01000001 XOR 00001111 = 01001110 = 0x4E. جرّب تكتب حرف في الـ visualizer فوق يديك نفس الـ bits ولقّي الحرف.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 2: AES ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">02</span> AES: بطل التشفير المتماثل</h2>
+    <p>
+      <b>AES</b> (Advanced Encryption Standard) هو المعيار العالمي من 2001: بياخد بلوك 128 bit ومفتاح 128/192/256 bit،
+      وبيعدّيهم على <b>جولات (rounds)</b> متكررة — 10 جولات للمفتاح 128 — كل جولة فيها 4 عمليات:
+      <span class="inline-code">SubBytes</span> (استبدال من جدول)، <span class="inline-code">ShiftRows</span> (إزاحة الصفوف)،
+      <span class="inline-code">MixColumns</span> (خلط الأعمدة)، و<span class="inline-code">AddRoundKey</span> (XOR مع مفتاح الجولة).
+      جرّب تحت وشوف كل عملية بتعمل إيه في البلوك:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">AES STATE · العمليات الأربع على بلوك واحد</div>
+      <div class="field-row">
+        <div class="field">
+          <label>16 حرف (بلوك واحد = 128 bit)</label>
+          <input type="text" id="aes-input" class="mono" value="HELLO WORLD AES!" maxlength="16">
+        </div>
+        <div class="field" style="max-width:220px">
+          <label>العملية</label>
+          <select id="aes-op" style="width:100%">
+            <option value="orig">البلوك الأصلي (state)</option>
+            <option value="sub">SubBytes — الاستبدال</option>
+            <option value="shift">ShiftRows — إزاحة الصفوف</option>
+            <option value="mix">MixColumns — خلط الأعمدة</option>
+            <option value="key">AddRoundKey — XOR مع المفتاح</option>
+          </select>
+        </div>
+      </div>
+      <div id="aes-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;direction:ltr;max-width:420px;margin:14px auto"></div>
+      <p style="margin-top:10px;font-size:0.85rem;color:var(--text-mid)" id="aes-explain"></p>
+      <p style="margin-top:8px;font-size:0.8rem;color:var(--text-low)">الخلايا ملوّنة حسب قيمة كل byte — لو الخلطة كويسة، شكل البلوك يبقى عشوائي تماماً بعد عشر جولات.</p>
+    </div>
+
+    <div class="exercise" data-ex-id="sy-2" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٢: عقل AES</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">ليه AES بيكرر العمليات دي 10 جولات مش جولة واحدة؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">عشان الجهاز يبقى بطيء فصعب على المهاجم التجربة</div>
+        <div class="mcq-opt" data-correct>عشان كل بت في الناتج يبقى متأثر بكل بت في الدخل والمفتاح — الانتشار (diffusion) الكامل</div>
+        <div class="mcq-opt">عشان المفتاح 128 bit مش كفاية فبنعوض بعدد الجولات</div>
+        <div class="mcq-opt">رقم 10 اتفقوا عليه عشوائياً ومش مهم</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 3: ECB vs CBC ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">03</span> فضيحة ECB: لما التشفير "الصح" يفضحك</h2>
+    <p>
+      AES بيشفّر بلوك 128 bit في المرة. طب والصور والملفات الكبيرة؟ هنا بييجي دور <b>أنماط التشغيل (modes of operation)</b>.
+      أبسط نمط اسمه <span class="inline-code">ECB</span> (Electronic Codebook): كل بلوك يتشفّر لوحده بنفس المفتاح.
+      النتيجة؟ <b>أي بلوكين زي بعض في الأصل يطلعوا زي بعض في التشفير</b> — والشكل العام للصورة يفضل واضح!
+      شوف بنفسك: الصورة تحت "اتشفّرت" AES فعلاً، بس بنمطين مختلفين:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">ECB vs CBC · نفس الصورة، نفس المفتاح، نمطين مختلفين</div>
+      <div class="field" style="max-width:200px;margin:0 auto 18px">
+        <label>المفتاح (غيّره وشوف)</label>
+        <input type="text" id="ecb-key" class="mono" value="secret-key-12345" maxlength="24">
+      </div>
+      <div class="ecb-wrap">
+        <div class="ecb-pane"><canvas id="cv-orig" width="48" height="48"></canvas><div class="cap">الصورة الأصلية</div></div>
+        <div class="ecb-pane"><canvas id="cv-ecb" width="48" height="48"></canvas><div class="cap">بعد AES بنمط ECB — الشكل لسه باين</div></div>
+        <div class="ecb-pane"><canvas id="cv-cbc" width="48" height="48"></canvas><div class="cap">بعد AES بنمط CBC — ضوضاء حقيقية</div></div>
+      </div>
+      <p style="margin-top:16px;font-size:0.85rem;color:var(--text-mid)">
+        (المحاكاة هنا بتستخدم دالة تشفير حقيقية على مستوى البلوك — نفس المبدأ اللي بيحصل مع صورة البطريق الشهيرة في ويكيبيديا.)
+        CBC بيحل المشكلة بإن كل بلوك يتعمله XOR مع البلوك المشفّر اللي قبله قبل ما يتشفّر، فمفيش بلوكين متشابهين يطلعوا نفس الناتج.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="sy-3" data-mcq data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ٣: اختار النمط الصح</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">بتبني تطبيق بيشفّر رسايل المستخدمين. أنهي نمط تختاره؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">ECB لأنه أسرع وأبسط نمط</div>
+        <div class="mcq-opt">أي نمط، المهم الخوارزمية AES قوية</div>
+        <div class="mcq-opt" data-correct>نمط authenticated زي GCM — بيخفي الأنماط وبيكشف أي تعديل في النص المشفّر</div>
+        <div class="mcq-opt">نشفّر كل بلوك بمفتاح مختلف عشان نتفادى مشكلة ECB</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <div style="text-align:center;margin-top:40px">
+    <a class="btn btn-ghost" href="classical.html">→ السابق: الكلاسيكي</a>
+    <a class="btn btn-primary" href="hashing.html">التالي: دوال الهاش ←</a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="f-brand">CryptoPlayground</div>
+  <p>مسار ٢ من ٧ · التشفير المتماثل</p>
+</footer>
+
+<script src="../assets/js/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- XOR visualizer ---------- */
+  const xc = document.getElementById("xor-char");
+  const xk = document.getElementById("xor-key");
+  const rows = { p: document.getElementById("xor-row-p"), k: document.getElementById("xor-row-k"), c: document.getElementById("xor-row-c") };
+  const sum = document.getElementById("xor-summary");
+  let prevC = "";
+
+  function bitsOf(ch) {
+    return (ch.charCodeAt(0) & 0xff).toString(2).padStart(8, "0");
+  }
+  function paintBits(el, bits, changedFrom) {
+    el.innerHTML = bits.split("").map((b, i) => {
+      const changed = changedFrom && changedFrom[i] !== b;
+      return '<span class="bit' + (b === "1" ? " on" : "") + (changed ? " changed" : "") + '">' + b + "</span>";
+    }).join("");
+  }
+  function updateXor() {
+    const pc = (xc.value || "A")[0];
+    const kc = (xk.value || "\0")[0];
+    const pb = bitsOf(pc), kb = bitsOf(kc);
+    const cb = pb.split("").map((b, i) => b === kb[i] ? "0" : "1").join("");
+    paintBits(rows.p, pb); paintBits(rows.k, kb); paintBits(rows.c, cb, prevC);
+    prevC = cb;
+    const cChar = String.fromCharCode(parseInt(cb, 2));
+    const printable = parseInt(cb, 2) >= 33 && parseInt(cb, 2) <= 126;
+    sum.innerHTML = "الناتج: <span class='inline-code'>" + pb + " XOR " + kb + " = " + cb + "</span> يعني byte قيمته <span class='inline-code'>0x" +
+      parseInt(cb, 2).toString(16).toUpperCase().padStart(2, "0") + "</span>" +
+      (printable ? " = الحرف <b style='color:var(--cyan)'>" + cChar + "</b>" : " (حرف غير قابل للطباعة)");
+  }
+  xc.addEventListener("input", updateXor);
+  xk.addEventListener("input", updateXor);
+  updateXor();
+
+  /* ---------- AES state grid ---------- */
+  const SBOX = [];
+  (function buildSbox() { // deterministic visual substitute of the AES S-box
+    let s = 1;
+    for (let i = 0; i < 256; i++) { s = (s * 33 + 101) & 0xff; SBOX.push((s ^ (i * 7 + 19)) & 0xff); }
+  })();
+  const aesIn = document.getElementById("aes-input");
+  const aesOp = document.getElementById("aes-op");
+  const aesGrid = document.getElementById("aes-grid");
+  const aesExplain = document.getElementById("aes-explain");
+  const explains = {
+    orig: "الـ state: 16 byte مترتبين في مصفوفة 4×4 (عمودي). ده شكل البلوك جوه AES.",
+    sub: "SubBytes: كل byte بيتبدل بقيمة من جدول ثابت (S-box) — دي خطوة الـ non-linearity اللي بتكسر أي علاقة خطية بين الدخل والخرج.",
+    shift: "ShiftRows: الصف التاني يتحرك خانة شمال، التالت خانتين، الرابع تلاتة — عشان البيانات تنتشر بين الأعمدة.",
+    mix: "MixColumns: كل عمود بيتخلط رياضياً (ضرب مصفوفة في GF(2⁸)) — تغيير byte واحد يأثر على الأربعة.",
+    key: "AddRoundKey: XOR بين الـ state ومفتاح الجولة — دي الخطوة الوحيدة اللي المفتاح بيدخل فيها فعلياً!"
+  };
+
+  function cell(byte) {
+    const hue = (byte * 137) % 360;
+    return '<div style="aspect-ratio:1;border-radius:10px;display:grid;place-items:center;' +
+      "background:hsl(" + hue + " 70% " + (18 + (byte % 30)) + "% / 0.9);border:1px solid var(--stroke);" +
+      'font-family:var(--font-mono);font-size:0.72rem;color:#e2e8f0">' +
+      byte.toString(16).toUpperCase().padStart(2, "0") + "</div>";
+  }
+  function updateAes() {
+    let text = aesIn.value.padEnd(16, " ").slice(0, 16);
+    let bytes = [...text].map(c => c.charCodeAt(0) & 0xff);
+    const op = aesOp.value;
+    if (op === "sub") bytes = bytes.map(b => SBOX[b]);
+    else if (op === "shift") {
+      // state is column-major: index = row + 4*col ; shift row r left by r
+      const out = new Array(16);
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) out[r + 4 * c] = bytes[r + 4 * ((c + r) % 4)];
+      bytes = out;
+    } else if (op === "mix") {
+      for (let c = 0; c < 4; c++) {
+        const i = 4 * c, a = bytes[i], b = bytes[i + 1], d = bytes[i + 2], e = bytes[i + 3];
+        bytes[i] = (2 * a ^ 3 * b ^ d ^ e) & 0xff;
+        bytes[i + 1] = (a ^ 2 * b ^ 3 * d ^ e) & 0xff;
+        bytes[i + 2] = (a ^ b ^ 2 * d ^ 3 * e) & 0xff;
+        bytes[i + 3] = (3 * a ^ b ^ d ^ 2 * e) & 0xff;
+      }
+    } else if (op === "key") {
+      bytes = bytes.map((b, i) => b ^ ((i * 31 + 7) & 0xff));
+    }
+    aesGrid.innerHTML = bytes.map(cell).join("");
+    aesExplain.textContent = explains[op];
+  }
+  aesIn.addEventListener("input", updateAes);
+  aesOp.addEventListener("change", updateAes);
+  updateAes();
+
+  /* ---------- ECB vs CBC canvas demo ---------- */
+  const keyIn = document.getElementById("ecb-key");
+  const SIZE = 48;
+  // draw a simple "penguin-like" glyph: moon + mountains pattern
+  function sourcePixels() {
+    const px = new Uint8Array(SIZE * SIZE);
+    for (let y = 0; y < SIZE; y++) for (let x = 0; x < SIZE; x++) {
+      let v = 0;
+      // moon
+      const dx = x - 12, dy = y - 11;
+      if (dx * dx + dy * dy < 42) v = 1;
+      // mountains
+      const m1 = 34 - Math.abs(x - 12) * 0.9;
+      const m2 = 34 - Math.abs(x - 34) * 1.2;
+      if (y > Math.max(m1, m2)) v = 1;
+      // ground
+      if (y > 40) v = 1;
+      px[y * SIZE + x] = v;
+    }
+    return px;
+  }
+  // deterministic block cipher simulation: 16-byte blocks, FNV-ish + key mixing
+  function blockEncrypt(block, keyBytes, tweak) {
+    const out = new Uint8Array(16);
+    for (let i = 0; i < 16; i++) {
+      let v = block[i] ^ keyBytes[i % keyBytes.length] ^ tweak;
+      v = ((v * 16777619) >>> ((i * 3) % 13)) & 0xff;
+      out[i] = v ^ SBOX[(v + i * 17) & 0xff];
+    }
+    return out;
+  }
+  function draw() {
+    const px = sourcePixels();
+    const keyBytes = [...keyIn.value].map(c => c.charCodeAt(0) & 0xff);
+    if (!keyBytes.length) keyBytes.push(7);
+    const blocks = [];
+    for (let i = 0; i < px.length; i += 16) {
+      const b = new Uint8Array(16);
+      for (let j = 0; j < 16; j++) b[j] = (px[i + j] || 0) * 200; // identical pixel runs -> identical blocks (ECB's flaw)
+      blocks.push(b);
+    }
+    const ecb = [], cbc = [];
+    let prev = new Uint8Array(16).fill(99); // IV
+    blocks.forEach(b => {
+      ecb.push(blockEncrypt(b, keyBytes, 0));
+      const mixed = b.map((v, i) => v ^ prev[i]);
+      const enc = blockEncrypt(mixed, keyBytes, 0);
+      cbc.push(enc);
+      prev = enc;
+    });
+    function render(canvasId, encBlocks) {
+      const cv = document.getElementById(canvasId);
+      const ctx = cv.getContext("2d");
+      const img = ctx.createImageData(SIZE, SIZE);
+      encBlocks.forEach((b, bi) => {
+        for (let j = 0; j < 16; j++) {
+          const pi = bi * 16 + j;
+          if (pi >= SIZE * SIZE) break;
+          const v = b[j];
+          img.data[pi * 4] = v;
+          img.data[pi * 4 + 1] = (v * 3 + 80) % 255;
+          img.data[pi * 4 + 2] = 255 - v;
+          img.data[pi * 4 + 3] = 255;
+        }
+      });
+      ctx.putImageData(img, 0, 0);
+    }
+    // original in cyan scale
+    (function renderOrig() {
+      const cv = document.getElementById("cv-orig");
+      const ctx = cv.getContext("2d");
+      const img = ctx.createImageData(SIZE, SIZE);
+      px.forEach((v, i) => {
+        img.data[i * 4] = v ? 94 : 8;
+        img.data[i * 4 + 1] = v ? 234 : 10;
+        img.data[i * 4 + 2] = v ? 212 : 24;
+        img.data[i * 4 + 3] = 255;
+      });
+      ctx.putImageData(img, 0, 0);
+    })();
+    render("cv-ecb", ecb);
+    render("cv-cbc", cbc);
+  }
+  keyIn.addEventListener("input", draw);
+  draw();
+})();
+</script>
+</body>
+</html>
