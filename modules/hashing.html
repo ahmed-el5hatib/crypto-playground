@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دوال الهاش — CryptoPlayground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <span class="logo-mark"><i class="ic" data-icon="logo"></i></span>
+    <span>CryptoPlayground<small>OPEN SOURCE · LEARN BY DOING</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#modules">المسارات</a>
+    <span class="nav-score" data-score>0 pts</span>
+  </div>
+</nav>
+
+<header class="lab-hero">
+  <div class="crumbs"><a href="../index.html#modules">المسارات</a> ← مسار ٣</div>
+  <h1>دوال الهاش <span class="en">HASH FUNCTIONS · SHA-256</span></h1>
+  <p>بصمة إصبع أي داتا: طول ثابت، مفيش رجعة، وأي تغيير ولو بت واحد يقلب الناتج كله. دي اللي بتحمي باسورداتك، وسلاسل الـ blockchain، وتكامل أي ملف بتنزله.</p>
+</header>
+
+<main class="lab-body">
+
+  <!-- ===================== LESSON 1: LIVE SHA-256 ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">01</span> جرّب SHA-256 لايف</h2>
+    <p>
+      دالة الهاش بتاخد أي إدخال — حرف واحد أو مكتبة كاملة — وبتطلّع <b>بصمة ثابتة الطول</b> (256 bit يعني 64 حرف hex في حالة SHA-256).
+      اكتب أي حاجة تحت وشوف البصمة بتتولد لحظياً جوه متصفحك:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">SHA-256 LIVE · البصمة بتتحسب في متصفحك مباشرة</div>
+      <div class="field">
+        <label>الإدخال (اكتب أي حاجة — عربي أو إنجليزي)</label>
+        <textarea id="hash-input" rows="3" placeholder="اكتب هنا...">hello</textarea>
+      </div>
+      <div class="output-box"><span class="lbl">SHA-256 DIGEST (HEX)</span><span id="hash-out">…</span></div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:0.82rem;color:var(--text-low)">
+        <span>طول الإدخال: <b id="hash-inlen" style="color:var(--cyan)">0</b> byte</span>
+        <span>طول البصمة: <b style="color:var(--cyan)">256 bit</b> دايماً</span>
+        <span>زمن الحساب: <b id="hash-time" style="color:var(--cyan)">0</b> ms</span>
+      </div>
+    </div>
+
+    <div class="exercise" data-ex-id="ha-1" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ١: خصائص الهاش</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">عندك البصمة <span class="inline-code">2cf24dba5fb0a30e...</span> بتاعت كلمة "hello". تقدر ترجّع كلمة "hello" من البصمة دي؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">أيوه، بفك تشفيرها بالمفتاح الصح</div>
+        <div class="mcq-opt" data-correct>لأ — دالة الهاش مش تشفير، مفيش رجعة. أقصى حاجة أجرّب كلام كتير لحد ما بصمته تطابق (brute force)</div>
+        <div class="mcq-opt">أيوه، بس لازم GPU قوي</div>
+        <div class="mcq-opt">لأ، لأن البصمة أقصر من النص الأصلي</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 2: AVALANCHE ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">02</span> تأثير الانهيار الجليدي (Avalanche Effect)</h2>
+    <p>
+      أهم خاصية في أي hash آمن: <b>غيّر بت واحد في الإدخال، يتغير ~نص بِتات الناتج</b>.
+      تحت هنشفر نصين مختلفين في حرف واحد بس، ونعرض الـ 256 bit بتاعة كل بصمة — الخلايا الوردية هي البتات اللي اتقلبت:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">AVALANCHE LAB · غيّر حرف واحد وعدّ البتات اللي قلبت</div>
+      <div class="field-row">
+        <div class="field"><label>النص الأول</label><input type="text" id="av-a" class="mono" value="The quick brown fox jumps over the lazy dog"></div>
+        <div class="field"><label>النص التاني (حاجة قريبة منه)</label><input type="text" id="av-b" class="mono" value="The quick brown fox jumps over the lazy doh"></div>
+      </div>
+      <div class="bit-label" style="direction:ltr;text-align:left">HASH A BITS</div>
+      <div class="avalanche-grid" id="av-grid-a" style="margin-bottom:10px"></div>
+      <div class="bit-label" style="direction:ltr;text-align:left">HASH B BITS — <span style="color:var(--pink)">الوردي = اتغيّر</span></div>
+      <div class="avalanche-grid" id="av-grid-b"></div>
+      <p style="margin-top:16px;font-size:0.95rem;color:var(--text-mid)" id="av-verdict"></p>
+    </div>
+
+    <div class="exercise" data-ex-id="ha-2" data-answer-hash="28fdae8deae31d6eafd18b70d878f6d8a3136f267ce273777c089a42ac590438" data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ٢: النسبة الذهبية</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">من اللي شفته فوق: لما يتغير بت واحد في الإدخال، تقريباً كام في المية من بتات البصمة بتتغير؟ (اكتبها زي: <span class="inline-code">50%</span>)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="النسبة..." data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 3: WHERE HASHES LIVE ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">03</span> الهاش في حياتك اليومية</h2>
+    <p>
+      المواقع الجدّعة <b>مش بتخزن باسوردك أصلاً</b> — بتخزن بصمته (مع <span class="inline-code">salt</span> وخوارزمية بطيئة زي bcrypt/Argon2).
+      ولما بتنزّل ملف، الـ checksum اللي جنبه بيتاكد إنه وصل سليم. والـ blockchain كلها قايمة على إن كل بلوك فيه بصمة اللي قبله.
+      جرّب تحت: محاكاة تسجيل دخول ببصمة بدل الباسورد:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">PASSWORD CHECK SIM · السيرفر مش شايف باسوردك أبداً</div>
+      <div class="field-row">
+        <div class="field"><label>اختار باسورد (هيتخزن هاشه بس)</label><input type="text" id="pw-set" class="mono" value="P@ssw0rd123"></div>
+        <div class="field"><label>دلوقتي سجّل دخول بالباسورد</label><input type="text" id="pw-try" class="mono" value=""></div>
+      </div>
+      <div class="field-row">
+        <div class="output-box" style="flex:1"><span class="lbl">STORED HASH (DATABASE)</span><span id="pw-stored" style="font-size:0.72rem">…</span></div>
+        <div class="output-box" style="flex:1"><span class="lbl">HASH OF YOUR ATTEMPT</span><span id="pw-attempt" style="font-size:0.72rem">…</span></div>
+      </div>
+      <p style="margin-top:14px;font-size:0.95rem" id="pw-verdict"></p>
+    </div>
+
+    <div class="exercise" data-ex-id="ha-3" data-answer-hash="51e8ea280b44e16934d4d611901f3d3afc41789840acdff81942c2f65009cd52" data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٣: الرقم الثابت</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">SHA-256 بيطلّع بصمة طولها كام bit؟ (رقم)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="الرقم..." maxlength="4" data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <div style="text-align:center;margin-top:40px">
+    <a class="btn btn-ghost" href="symmetric.html">→ السابق: المتماثل</a>
+    <a class="btn btn-ghost" href="../index.html#modules">ارجع للخريطة — المسارات الجاية قريباً</a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="f-brand">CryptoPlayground</div>
+  <p>مسار ٣ من ٧ · دوال الهاش</p>
+</footer>
+
+<script src="../assets/js/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  const { sha256 } = window.CP;
+
+  /* ---------- live SHA-256 ---------- */
+  const hIn = document.getElementById("hash-input");
+  const hOut = document.getElementById("hash-out");
+  const hLen = document.getElementById("hash-inlen");
+  const hTime = document.getElementById("hash-time");
+  async function updateHash() {
+    const t0 = performance.now();
+    const h = await sha256(hIn.value);
+    const ms = (performance.now() - t0).toFixed(1);
+    hOut.textContent = h;
+    hLen.textContent = new TextEncoder().encode(hIn.value).length;
+    hTime.textContent = ms;
+  }
+  hIn.addEventListener("input", updateHash);
+  updateHash();
+
+  /* ---------- avalanche ---------- */
+  const avA = document.getElementById("av-a");
+  const avB = document.getElementById("av-b");
+  const gridA = document.getElementById("av-grid-a");
+  const gridB = document.getElementById("av-grid-b");
+  const verdict = document.getElementById("av-verdict");
+
+  function hexToBits(hex) {
+    return [...hex].map(c => parseInt(c, 16).toString(2).padStart(4, "0")).join("");
+  }
+  async function updateAvalanche() {
+    const [ha, hb] = await Promise.all([sha256(avA.value), sha256(avB.value)]);
+    const ba = hexToBits(ha), bb = hexToBits(hb);
+    let diff = 0;
+    gridA.innerHTML = [...ba].map(b => '<div class="cell' + (b === "1" ? " on" : "") + '"></div>').join("");
+    gridB.innerHTML = [...bb].map((b, i) => {
+      const changed = ba[i] !== b;
+      if (changed) diff++;
+      return '<div class="cell' + (changed ? " diff" : (b === "1" ? " on" : "")) + '"></div>';
+    }).join("");
+    const pct = (diff / 256 * 100).toFixed(1);
+    verdict.innerHTML = "من أصل <b>256</b> bit، اتغيّر <b style='color:var(--pink)'>" + diff + "</b> (" + pct + "%)" +
+      (avA.value === avB.value ? " — النصين زي بعض، فمفيش ولا بت اتغيّر. جرّب تغيّر حرف واحد بس!" : " — من تغيير بسيط في النص! دي ظاهرة الـ avalanche");
+  }
+  avA.addEventListener("input", updateAvalanche);
+  avB.addEventListener("input", updateAvalanche);
+  updateAvalanche();
+
+  /* ---------- password sim ---------- */
+  const pwSet = document.getElementById("pw-set");
+  const pwTry = document.getElementById("pw-try");
+  const pwStored = document.getElementById("pw-stored");
+  const pwAttempt = document.getElementById("pw-attempt");
+  const pwVerdict = document.getElementById("pw-verdict");
+  async function updatePw() {
+    const [stored, attempt] = await Promise.all([sha256("salt:" + pwSet.value), sha256("salt:" + pwTry.value)]);
+    pwStored.textContent = stored;
+    pwAttempt.textContent = pwTry.value ? attempt : "(اكتب باسورد المحاولة فوق)";
+    if (!pwTry.value) { pwVerdict.textContent = ""; return; }
+    if (stored === attempt) {
+      pwVerdict.innerHTML = "<b style='color:var(--green)'>البصمتين زي بعض — تسجيل دخول ناجح!</b> لاحظ: السيرفر مقارن هاش بهاش، ومحتاجش يعرف الباسورد نفسه.";
+    } else {
+      pwVerdict.innerHTML = "<b style='color:var(--red)'>البصمتين مختلفين — باسورد غلط.</b> حتى لو الفرق حرف واحد، الهاش مختلف تماماً.";
+    }
+  }
+  pwSet.addEventListener("input", updatePw);
+  pwTry.addEventListener("input", updatePw);
+  updatePw();
+})();
+</script>
+</body>
+</html>
