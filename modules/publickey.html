@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التشفير بالمفتاح العام — CryptoPlayground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <span class="logo-mark"><i class="ic" data-icon="logo"></i></span>
+    <span>CryptoPlayground<small>OPEN SOURCE · LEARN BY DOING</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#modules">المسارات</a>
+    <span class="nav-score" data-score>0 pts</span>
+  </div>
+</nav>
+
+<header class="lab-hero">
+  <div class="crumbs"><a href="../index.html#modules">المسارات</a> ← مسار ٤</div>
+  <h1>التشفير بالمفتاح العام <span class="en">PUBLIC-KEY CRYPTOGRAPHY</span></h1>
+  <p>السؤال اللي حيّر العالم: إزاي طرفين مش واثقين في بعض يتفقوا على سر، وكل كلامهم بيتسمع؟ الإجابة غيّرت التاريخ: مفتاح للقفل ومفتاح للفتح. هنا هتحسب Diffie-Hellman وRSA بأرقام صغيرة بإيدك.</p>
+</header>
+
+<main class="lab-body">
+
+  <!-- ===================== LESSON 1: DIFFIE-HELLMAN ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">01</span> Diffie-Hellman: السر اللي بيتولد من العلن</h2>
+    <p>
+      أليس وبوب عايزين مفتاح مشترك، وإيف بتسمع <b>كل حاجة</b> بتتبعت. الفكرة العبقرية (1976):
+      يتفقوا علناً على عدد أولي <span class="inline-code">p</span> ومولّد <span class="inline-code">g</span>.
+      كل واحد يختار سراً خاصاً، يبعت <span class="inline-code">g^secret mod p</span> العلني،
+      وبعدين يرفع اللي وصله لقوته السرية — والاتنين يوصلوا <b>لنفس الرقم</b> من غير ما حد بعته أصلاً.
+      جرّب بنفسك (كل الحسابات هنا على أرقام صغيرة عشان تشوفها):
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">DH EXCHANGE · بروتوكول حي بأرقام حقيقية</div>
+      <div class="field-row">
+        <div class="field" style="max-width:150px"><label>الأولي p</label><input type="text" id="dh-p" class="mono" value="23"></div>
+        <div class="field" style="max-width:150px"><label>المولّد g</label><input type="text" id="dh-g" class="mono" value="5"></div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>سر أليس a: <span class="range-val" id="dh-a-val">6</span></label>
+          <input type="range" id="dh-a" min="2" max="20" value="6">
+        </div>
+        <div class="field">
+          <label>سر بوب b: <span class="range-val" id="dh-b-val">15</span></label>
+          <input type="range" id="dh-b" min="2" max="20" value="15">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin:18px 0;direction:ltr">
+        <div style="text-align:center">
+          <div style="font-weight:700;color:var(--cyan)">ALICE</div>
+          <div class="output-box" style="margin-top:8px;min-height:auto"><span class="lbl">SECRET a</span><span id="dh-a-box"></span></div>
+          <div class="output-box" style="margin-top:8px;min-height:auto"><span class="lbl">SENDS A = gᵃ mod p</span><span id="dh-A-box" style="color:var(--amber)"></span></div>
+        </div>
+        <div style="font-size:1.4rem;color:var(--text-low)">⇄</div>
+        <div style="text-align:center">
+          <div style="font-weight:700;color:var(--violet)">BOB</div>
+          <div class="output-box" style="margin-top:8px;min-height:auto"><span class="lbl">SECRET b</span><span id="dh-b-box"></span></div>
+          <div class="output-box" style="margin-top:8px;min-height:auto"><span class="lbl">SENDS B = gᵇ mod p</span><span id="dh-B-box" style="color:var(--amber)"></span></div>
+        </div>
+      </div>
+      <div class="output-box" style="text-align:center;border-color:rgba(52,211,153,0.4)"><span class="lbl">SHARED SECRET — كل طرف حسبه لوحده</span><span id="dh-s-box" style="font-size:1.3rem;color:var(--green)"></span></div>
+      <p style="margin-top:12px;font-size:0.82rem;color:var(--text-low)" id="dh-eve"></p>
+    </div>
+
+    <div class="exercise" data-ex-id="pk-1" data-answer-hash="d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35" data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ١: إيدك على البروتوكول</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">بـ <span class="inline-code">p=23, g=5</span>: أليس اختارت <span class="inline-code">a=6</span> وبوب اختار <span class="inline-code">b=15</span>. إيه قيمة السر المشترك؟ (رقم)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="السر المشترك..." data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">احسب A = 5⁶ mod 23 = 8، وبعدين السر = Bᵃ mod p حيث B = 5¹⁵ mod 23 = 19، يعني 19⁶ mod 23. أو ببساطة اضبط السلايدرز فوق على 6 و15 وشوف الناتج الأخضر.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 2: RSA ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">02</span> RSA: قفل بمفتاح عام، فتح بمفتاح خاص</h2>
+    <p>
+      RSA (1977) بيحوّل الفكرة لتشفير فعلي: بتولّد زوج مفاتيح من عددين أوليين <span class="inline-code">p, q</span>.
+      المفتاح العام <span class="inline-code">(n, e)</span> متاح للكل وبيشفّر، والخاص <span class="inline-code">d</span> بيفك.
+      أمانه قائم على إن <b>تحليل n لعواملها الأولية صعب جداً</b> لما الأرقام تبقى ضخمة.
+      ولّد مفاتيح بنفسك وشفّر رسالة رقمية:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">RSA LAB · من الأعداد الأولية للتشفير</div>
+      <div class="field-row">
+        <div class="field" style="max-width:130px"><label>أولي p</label><input type="text" id="rsa-p" class="mono" value="61"></div>
+        <div class="field" style="max-width:130px"><label>أولي q</label><input type="text" id="rsa-q" class="mono" value="53"></div>
+        <div class="field" style="max-width:130px"><label>الرسالة m (رقم &lt; n)</label><input type="text" id="rsa-m" class="mono" value="65"></div>
+      </div>
+      <div id="rsa-steps" style="font-family:var(--font-mono);font-size:0.85rem;direction:ltr;text-align:left;color:var(--text-mid);margin:14px 0;line-height:2"></div>
+      <div class="field-row">
+        <div class="output-box" style="flex:1"><span class="lbl">CIPHERTEXT c = mᵉ mod n</span><span id="rsa-c" style="color:var(--pink)"></span></div>
+        <div class="output-box" style="flex:1"><span class="lbl">DECRYPTED cᵈ mod n</span><span id="rsa-back" style="color:var(--green)"></span></div>
+      </div>
+      <p style="margin-top:12px;font-size:0.82rem;color:var(--text-low)">
+        في الواقع p وq بيبقوا 1024 bit أو أكتر لكل واحد — جرّب تحلل n اللي طلّعته لفهم ليه ده مستحيل عملياً بالأرقام الكبيرة.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="pk-2" data-answer-hash="b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9" data-pts="15">
+      <div class="ex-head"><span class="ex-title">تحدي ٢: شفّر بـ RSA</span><span class="ex-pts">15 PTS</span></div>
+      <p class="q">بـ <span class="inline-code">p=3, q=11</span> ومفتاح عام <span class="inline-code">e=7</span>: شفّر الرسالة <span class="inline-code">m=4</span>. إيه الـ ciphertext؟ (رقم)</p>
+      <div class="ex-row">
+        <input type="text" placeholder="c = ?" data-ex-input>
+        <button class="btn btn-primary btn-sm" data-check>تحقق</button>
+      </div>
+      <div class="ex-feedback"></div>
+      <div class="ex-hint">محتاج تلميحة؟
+        <span class="hint-body">n = 33 و e = 7، يبقى c = 4⁷ mod 33 = 16384 mod 33. اضبط المعمل فوق على p=3 وq=11 وm=4 وتأكد.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LESSON 3: ECC ===================== -->
+  <section class="lesson reveal">
+    <h2><span class="num">03</span> المنحنيات الإهليجية (ECC): نفس القوة بحجم أصغر</h2>
+    <p>
+      RSA بمفتاح 2048 bit تتعادل قوته مع ECC بمفتاح 256 bit بس — وعشان كده موبايلك والـ blockchain بيستخدموا ECC.
+      الفكرة: نقاط على منحنى <span class="inline-code">y² = x³ + ax + b</span>، و"جمع" النقاط عملية خاصة:
+      خد نقطتين، مدّ الخط اللي بينهم، نقطة التقاطع التالتة معكوسة على محور x هي الناتج.
+      شوف المنحنى وجمعة النقاط على الرسم:
+    </p>
+
+    <div class="widget">
+      <div class="widget-title">EC VISUALIZER · منحنى حقيقي y² = x³ − 3x + 5</div>
+      <div class="field-row">
+        <div class="field"><label>النقطة P (حرّكها على المنحنى): <span class="range-val" id="ec-p-val"></span></label><input type="range" id="ec-px" min="-20" max="26" value="-12"></div>
+        <div class="field"><label>النقطة Q: <span class="range-val" id="ec-q-val"></span></label><input type="range" id="ec-qx" min="-20" max="26" value="14"></div>
+      </div>
+      <canvas id="ec-canvas" width="520" height="380" style="width:100%;max-width:520px;display:block;margin:10px auto;border-radius:12px;border:1px solid var(--stroke);background:#02060f"></canvas>
+      <p style="margin-top:10px;font-size:0.85rem;color:var(--text-mid)" id="ec-caption"></p>
+      <p style="margin-top:8px;font-size:0.8rem;color:var(--text-low)">
+        في التطبيق الحقيقي المنحنى بيتاخد mod p فبيبقى نقاط متناثرة مش خط متصل، والجمع المتكرر k مرة (k·P) هو "التشفير": معرفة k من الناتج هو مسألة اللوغاريتم المنفصل — صعبة جداً حتى على كمبيوتر كمي... مش بالضبط، Shor بيكسرها برضه! دي حكاية مسار PQC.
+      </p>
+    </div>
+
+    <div class="exercise" data-ex-id="pk-3" data-mcq data-pts="10">
+      <div class="ex-head"><span class="ex-title">تحدي ٣: التشفير الهجين</span><span class="ex-pts">10 PTS</span></div>
+      <p class="q">لو التشفير بالمفتاح العام قوي كده، ليه HTTPS مش بيشفّر كل الداتا بـ RSA/ECC على طول؟</p>
+      <div class="mcq-options">
+        <div class="mcq-opt">لأن المفتاح العام مش بيقدر يشفّر غير رسايل قصيرة قانونياً</div>
+        <div class="mcq-opt" data-correct>لأنه بطيء حسابياً — فبيستخدموه يتبادلوا مفتاح متماثل (زي AES) وبعدين يشفّروا الداتا بيه: دي فكرة الـ hybrid encryption</div>
+        <div class="mcq-opt">لأن RSA اتكسر ومتبقاش مستخدم</div>
+        <div class="mcq-opt">لأن المتصفحات مش بتدعمه</div>
+      </div>
+      <div class="ex-feedback"></div>
+    </div>
+  </section>
+
+  <div style="text-align:center;margin-top:40px">
+    <a class="btn btn-ghost" href="hashing.html">→ السابق: الهاش</a>
+    <a class="btn btn-primary" href="signatures.html">التالي: التوقيعات الرقمية ←</a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="f-brand">CryptoPlayground</div>
+  <p>مسار ٤ من ٧ · التشفير بالمفتاح العام</p>
+</footer>
+
+<script src="../assets/js/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  function modpow(base, exp, mod) {
+    base = ((base % mod) + mod) % mod;
+    let r = 1;
+    while (exp > 0) {
+      if (exp & 1) r = (r * base) % mod;
+      base = (base * base) % mod;
+      exp >>= 1;
+    }
+    return r;
+  }
+
+  /* ---------- DH ---------- */
+  const dhp = document.getElementById("dh-p"), dhg = document.getElementById("dh-g");
+  const dha = document.getElementById("dh-a"), dhb = document.getElementById("dh-b");
+  function updateDH() {
+    const p = Math.max(2, parseInt(dhp.value, 10) || 23);
+    const g = Math.max(2, parseInt(dhg.value, 10) || 5);
+    const a = parseInt(dha.value, 10), b = parseInt(dhb.value, 10);
+    document.getElementById("dh-a-val").textContent = a;
+    document.getElementById("dh-b-val").textContent = b;
+    const A = modpow(g, a, p), B = modpow(g, b, p);
+    const s1 = modpow(B, a, p), s2 = modpow(A, b, p);
+    document.getElementById("dh-a-box").textContent = a;
+    document.getElementById("dh-b-box").textContent = b;
+    document.getElementById("dh-A-box").textContent = g + "^" + a + " mod " + p + " = " + A;
+    document.getElementById("dh-B-box").textContent = g + "^" + b + " mod " + p + " = " + B;
+    document.getElementById("dh-s-box").textContent = s1 + (s1 === s2 ? " ✓" : " ≠ " + s2 + " (راجِع المدخلات)");
+    document.getElementById("dh-eve").textContent =
+      "إيف اللي بتسمع شافت بس: p=" + p + ", g=" + g + ", A=" + A + ", B=" + B + ". عشان توصل للسر " + s1 +
+      " محتاجة تحل مسألة اللوغاريتم المنفصل (تطلّع a من A) — سهلة هنا لأن p صغير، مستحيلة عملياً بأرقام 2048-bit.";
+  }
+  [dhp, dhg, dha, dhb].forEach(el => el.addEventListener("input", updateDH));
+  updateDH();
+
+  /* ---------- RSA ---------- */
+  const rp = document.getElementById("rsa-p"), rq = document.getElementById("rsa-q"), rm = document.getElementById("rsa-m");
+  function isPrime(n) { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; }
+  function egcd(a, b) { return b === 0 ? [a, 1, 0] : (() => { const [g, x, y] = egcd(b, a % b); return [g, y, x - Math.floor(a / b) * y]; })(); }
+  function updateRSA() {
+    const p = parseInt(rp.value, 10), q = parseInt(rq.value, 10), m = parseInt(rm.value, 10);
+    const steps = document.getElementById("rsa-steps");
+    if (!isPrime(p) || !isPrime(q) || p === q) {
+      steps.innerHTML = '<span style="color:var(--red)">اختار عددين أوليين مختلفين (p و q)</span>';
+      document.getElementById("rsa-c").textContent = "—";
+      document.getElementById("rsa-back").textContent = "—";
+      return;
+    }
+    const n = p * q, phi = (p - 1) * (q - 1);
+    let e = 3;
+    while (e < phi && egcd(e, phi)[0] !== 1) e += 2;
+    const d = ((egcd(e, phi)[1] % phi) + phi) % phi;
+    if (!(m >= 0 && m < n)) {
+      steps.innerHTML = '<span style="color:var(--red)">الرسالة m لازم تبقى بين 0 و ' + (n - 1) + "</span>";
+      document.getElementById("rsa-c").textContent = "—";
+      document.getElementById("rsa-back").textContent = "—";
+      return;
+    }
+    const c = modpow(m, e, n), back = modpow(c, d, n);
+    steps.innerHTML =
+      "n = p·q = " + p + "·" + q + " = <b style='color:var(--cyan)'>" + n + "</b><br>" +
+      "φ(n) = (p−1)(q−1) = " + phi + "<br>" +
+      "e = " + e + " (أصغر عدد أولي نسبي مع φ) &nbsp;·&nbsp; d = e⁻¹ mod φ = " + d +
+      " &nbsp;<span style='color:var(--text-low)'>(" + e + "·" + d + " = " + (e * d) + " ≡ 1 mod " + phi + ")</span><br>" +
+      "<span style='color:var(--green)'>PUBLIC</span> = (" + n + ", " + e + ") · <span style='color:var(--pink)'>PRIVATE</span> = " + d;
+    document.getElementById("rsa-c").textContent = m + "^" + e + " mod " + n + " = " + c;
+    document.getElementById("rsa-back").textContent = c + "^" + d + " mod " + n + " = " + back + (back === m ? " ✓" : "");
+  }
+  [rp, rq, rm].forEach(el => el.addEventListener("input", updateRSA));
+  updateRSA();
+
+  /* ---------- ECC visualizer ---------- */
+  const cv = document.getElementById("ec-canvas");
+  const ctx = cv.getContext("2d");
+  const epx = document.getElementById("ec-px"), eqx = document.getElementById("ec-qx");
+  const A_COEF = -3, B_COEF = 5;
+  const XMIN = -3.2, XMAX = 3.6, YMIN = -7, YMAX = 7;
+  function fx(x) { return x * x * x + A_COEF * x + B_COEF; }
+  function toPx(x, y) {
+    return [((x - XMIN) / (XMAX - XMIN)) * cv.width, cv.height - ((y - YMIN) / (YMAX - YMIN)) * cv.height];
+  }
+  function ptOnCurve(xRaw, side) {
+    // project slider x onto the curve: find nearest x where fx >= 0, take y = ±sqrt
+    let x = xRaw / 10;
+    for (let xi = x; xi < XMAX; xi += 0.01) { if (fx(xi) >= 0) { x = xi; break; } }
+    const y = Math.sqrt(fx(x)) * side;
+    return [x, y];
+  }
+  function drawEC() {
+    const P = ptOnCurve(parseInt(epx.value, 10), 1);
+    const Q = ptOnCurve(parseInt(eqx.value, 10), -1);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    // axes
+    ctx.strokeStyle = "rgba(148,163,184,0.2)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    const [ox0, oy0] = toPx(XMIN, 0), [ox1] = toPx(XMAX, 0);
+    ctx.moveTo(ox0, oy0); ctx.lineTo(ox1, oy0);
+    const [ax0, ay0] = toPx(0, YMIN), [, ay1] = toPx(0, YMAX);
+    ctx.moveTo(ax0, ay0); ctx.lineTo(ax0, ay1);
+    ctx.stroke();
+    // curve
+    ctx.strokeStyle = "#22d3ee";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    let started = false;
+    for (let x = XMIN; x <= XMAX; x += 0.005) {
+      const v = fx(x);
+      if (v < 0) { started = false; continue; }
+      const y = Math.sqrt(v);
+      for (const s of [1, -1]) {
+        const [px, py] = toPx(x, y * s);
+        if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+      }
+    }
+    ctx.stroke();
+    // secant line through P, Q
+    const [x1, y1] = P, [x2, y2] = Q;
+    if (Math.abs(x1 - x2) > 1e-9) {
+      const m = (y2 - y1) / (x2 - x1);
+      const x3 = m * m - x1 - x2;
+      const y3 = m * (x1 - x3) - y1;
+      // line
+      ctx.strokeStyle = "rgba(251,191,36,0.7)";
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      const [lx0, ly0] = toPx(XMIN, m * (XMIN - x1) + y1);
+      const [lx1, ly1] = toPx(XMAX, m * (XMAX - x1) + y1);
+      ctx.moveTo(lx0, ly0); ctx.lineTo(lx1, ly1);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // R = -intersection (third point), and R' = P+Q
+      const [rpx, rpy] = toPx(x3, -(-y3)); // intersection point (x3, y3)... careful below
+      const [ix, iy] = toPx(x3, y3);
+      const [sx, sy] = toPx(x3, -y3);
+      ctx.fillStyle = "#f472b6";
+      ctx.beginPath(); ctx.arc(ix, iy, 6, 0, 7); ctx.fill();
+      ctx.fillStyle = "#34d399";
+      ctx.beginPath(); ctx.arc(sx, sy, 7, 0, 7); ctx.fill();
+      ctx.strokeStyle = "rgba(52,211,153,0.6)";
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.moveTo(ix, iy); ctx.lineTo(sx, sy); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = "12px JetBrains Mono";
+      ctx.fillText("R∩", ix + 10, iy);
+      ctx.fillText("P+Q", sx + 10, sy);
+      document.getElementById("ec-caption").innerHTML =
+        "الخط القاطع بين P وQ بيخبط المنحنى في نقطة تالتة (<span style='color:var(--pink)'>R∩</span>)، وانعكاسها على محور x هو <b style='color:var(--green)'>P+Q</b>. P = (" +
+        x1.toFixed(2) + ", " + y1.toFixed(2) + ") · Q = (" + x2.toFixed(2) + ", " + y2.toFixed(2) + ")";
+    }
+    // P, Q points
+    const [ppx, ppy] = toPx(P[0], P[1]);
+    const [qpx, qpy] = toPx(Q[0], Q[1]);
+    ctx.fillStyle = "#22d3ee";
+    ctx.beginPath(); ctx.arc(ppx, ppy, 7, 0, 7); ctx.fill();
+    ctx.fillStyle = "#8b5cf6";
+    ctx.beginPath(); ctx.arc(qpx, qpy, 7, 0, 7); ctx.fill();
+    ctx.fillStyle = "#e2e8f0";
+    ctx.fillText("P", ppx + 10, ppy - 8);
+    ctx.fillText("Q", qpx + 10, qpy + 12);
+    document.getElementById("ec-p-val").textContent = "(" + P[0].toFixed(2) + ", " + P[1].toFixed(2) + ")";
+    document.getElementById("ec-q-val").textContent = "(" + Q[0].toFixed(2) + ", " + Q[1].toFixed(2) + ")";
+  }
+  epx.addEventListener("input", drawEC);
+  eqx.addEventListener("input", drawEC);
+  drawEC();
+})();
+</script>
+</body>
+</html>
